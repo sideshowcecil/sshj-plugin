@@ -44,10 +44,12 @@ Demo-Ubuntu:
   node-executor: sshj-ssh
   file-copier: sshj-scp
   tags: ubuntu
+  ssh-authentication: password
+  ssh-password-storage-path: keys/node/samuel.password
+  sudo-password-storage-path: keys/node/sudo.password
   ssh-password-option: option.password
   sudo-command-enabled: 'true'
-  sudo-password-storage-path: keys/node/sudo.password
-  ssh-password-storage-path: keys/node/samuel.password
+  
 ```
 
 # Status

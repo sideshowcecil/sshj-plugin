@@ -55,6 +55,7 @@ public class SSHJAuthentication {
                     key = ssh.loadKeys(privateKeyFile, passphrase);
                 }
                 ssh.authPublickey(username, key);
+                break;
             case password:
                 String passwordPath = connectionParameters.getPasswordStoragePath();
                 if(passwordPath!=null){
@@ -71,6 +72,7 @@ public class SSHJAuthentication {
                 }else{
                     throw new SSHJBuilder.BuilderException("SSH password wasn't set, please define a password");
                 }
+                break;
         }
     }
 }

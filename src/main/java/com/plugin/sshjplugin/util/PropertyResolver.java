@@ -1,14 +1,11 @@
 package com.plugin.sshjplugin.util;
 
-import com.dtolabs.rundeck.core.Constants;
-import com.dtolabs.rundeck.core.common.Framework;
+import com.dtolabs.rundeck.core.common.IFramework;
 import com.dtolabs.rundeck.core.common.INodeEntry;
 import com.dtolabs.rundeck.core.common.IRundeckProject;
 import com.dtolabs.rundeck.core.dispatcher.DataContextUtils;
 import com.dtolabs.rundeck.core.execution.ExecutionContext;
-import com.dtolabs.rundeck.core.execution.utils.ResolverUtil;
 import com.dtolabs.rundeck.core.storage.ResourceMeta;
-import com.plugin.sshjplugin.SSHJNodeExecutorPlugin;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -17,11 +14,11 @@ import java.util.Map;
 
 public class PropertyResolver {
     private INodeEntry node;
-    private Framework framework;
+    private IFramework framework;
     private ExecutionContext context;
     private IRundeckProject frameworkProject;
 
-    public PropertyResolver(INodeEntry node, Framework framework, ExecutionContext context) {
+    public PropertyResolver(INodeEntry node, IFramework framework, ExecutionContext context) {
         this.node = node;
         this.framework = framework;
         this.context = context;
@@ -103,7 +100,7 @@ public class PropertyResolver {
         long timeout = defval;
         String opt = resolve(key);
         if (opt == null && frameworkProp != null && framework.getPropertyLookup().hasProperty(frameworkProp)) {
-            opt = framework.getProperty(frameworkProp);
+            opt = framework.getPropertyLookup().getProperty(frameworkProp);
         }
         if (opt != null) {
             try {
@@ -140,11 +137,11 @@ public class PropertyResolver {
     }
 
     public boolean hasProperty(String property){
-        return framework.hasProperty(property);
+        return framework.getPropertyLookup().hasProperty(property);
     }
 
     public String getProperty(String property){
-        return framework.getProperty(property);
+        return framework.getPropertyLookup().getProperty(property);
     }
 
 }

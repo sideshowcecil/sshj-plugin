@@ -2,6 +2,7 @@ package com.plugin.sshjplugin.model;
 
 import com.dtolabs.rundeck.core.Constants;
 import com.dtolabs.rundeck.core.common.Framework;
+import com.dtolabs.rundeck.core.common.IFramework;
 import com.dtolabs.rundeck.core.common.INodeEntry;
 import com.dtolabs.rundeck.core.dispatcher.DataContextUtils;
 import com.dtolabs.rundeck.core.execution.ExecutionContext;
@@ -18,11 +19,11 @@ import java.util.regex.Pattern;
 public class SSHJConnectionParameters implements SSHJConnection{
 
     private INodeEntry node;
-    private Framework framework;
+    private IFramework framework;
     private ExecutionContext context;
     private PropertyResolver propertyResolver;
 
-    public SSHJConnectionParameters(INodeEntry node, Framework framework, ExecutionContext context) {
+    public SSHJConnectionParameters(INodeEntry node, IFramework framework, ExecutionContext context) {
         this.node = node;
         this.context = context;
         this.framework = framework;
@@ -70,9 +71,9 @@ public class SSHJConnectionParameters implements SSHJConnection{
 
     String getPrivateKeyfilePath() {
         String path = propertyResolver.resolve(SSHJNodeExecutorPlugin.NODE_ATTR_SSH_KEYPATH);
-        if (path == null && framework.hasProperty(Constants.SSH_KEYPATH_PROP)) {
+        if (path == null && framework.getPropertyLookup().hasProperty(Constants.SSH_KEYPATH_PROP)) {
             //return default framework level
-            path = framework.getProperty(Constants.SSH_KEYPATH_PROP);
+            path = framework.getPropertyLookup().getProperty(Constants.SSH_KEYPATH_PROP);
         }
         //expand properties in path
         if (path != null && path.contains("${")) {

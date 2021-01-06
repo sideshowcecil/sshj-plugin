@@ -1,6 +1,7 @@
 package com.plugin.sshjplugin;
 
 import com.dtolabs.rundeck.core.common.Framework;
+import com.dtolabs.rundeck.core.common.IFramework;
 import com.dtolabs.rundeck.core.common.INodeEntry;
 import com.dtolabs.rundeck.core.execution.ExecutionContext;
 import com.dtolabs.rundeck.core.execution.ExecutionListener;
@@ -103,6 +104,7 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, Describable {
     private Framework framework;
 
 
+    public SSHJNodeExecutorPlugin() {}
     public SSHJNodeExecutorPlugin(Framework framework) {
         this.framework = framework;
     }
@@ -221,7 +223,7 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, Describable {
 
         final ExecutionListener listener = context.getExecutionListener();
 
-        SSHJConnectionParameters connectionInfo = new SSHJConnectionParameters(node, framework, context);
+        SSHJConnectionParameters connectionInfo = new SSHJConnectionParameters(node, context.getIFramework(), context);
 
         long contimeout = connectionInfo.getConnectTimeout();
         long commandtimeout = connectionInfo.getCommandTimeout();
@@ -247,7 +249,7 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, Describable {
             sshexec.execute(connection);
             success = true;
         } catch (Exception e) {
-            final ExtractFailure extractJschFailure = extractFailure(e, node, commandtimeout, contimeout, framework);
+            final ExtractFailure extractJschFailure = extractFailure(e, node, commandtimeout, contimeout, context.getIFramework());
             errormsg = extractJschFailure.getErrormsg();
             failureReason = extractJschFailure.getReason();
             context.getExecutionListener().log(
@@ -287,7 +289,7 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, Describable {
             INodeEntry node,
             long commandTimeout,
             long connectTimeout,
-            Framework framework
+            IFramework framework
     ) {
         String errormsg;
         FailureReason failureReason;

@@ -1,5 +1,6 @@
 package com.plugin.sshjplugin
 
+import com.dtolabs.rundeck.core.common.IFramework
 import com.dtolabs.rundeck.core.common.NodeEntryImpl
 import com.dtolabs.rundeck.core.data.BaseDataContext
 import com.dtolabs.rundeck.core.execution.ExecutionContext
@@ -19,7 +20,7 @@ import com.dtolabs.rundeck.core.common.IRundeckProject
 
 class SSHJNodeExecutorPluginSpec extends Specification {
 
-    def getContext(ExecutionLogger logger, Boolean fail){
+    def getContext(IFramework iFramework, ExecutionLogger logger, Boolean fail){
 
             def manager = Mock(ProjectManager){
                 getFrameworkProject(_)>> Mock(IRundeckProject) {
@@ -41,9 +42,7 @@ class SSHJNodeExecutorPluginSpec extends Specification {
             Mock(ExecutionContext){
                 getExecutionLogger()>>logger
                 getFrameworkProject() >> "test"
-                getFramework() >> Mock(Framework) {
-                    getFrameworkProjectMgr() >> manager
-                }
+                getIFramework() >> iFramework
                 getExecutionListener() >> Mock(ExecutionListener){
                     createOverride()>>Mock(ExecutionListenerOverride)
                 }
@@ -68,11 +67,10 @@ class SSHJNodeExecutorPluginSpec extends Specification {
 
         String[] command = ["ls -lrt"]
         def logger = Mock(ExecutionLogger)
-        def context = getContext(logger,true)
         def properties = new Properties()
         properties.setProperty("fwkprop","fwkvalue")
 
-        def framework = Mock(Framework){
+        def framework = Mock(IFramework){
             getFrameworkProjectMgr() >> Mock(ProjectManager){
                 getFrameworkProject(_)>>Mock(IRundeckProject)
             }
@@ -80,7 +78,8 @@ class SSHJNodeExecutorPluginSpec extends Specification {
 
 
         }
-        def example = new SSHJNodeExecutorPlugin(framework)
+        def context = getContext(framework,logger,true)
+        def example = new SSHJNodeExecutorPlugin()
 
 
         /*
@@ -126,7 +125,7 @@ class SSHJNodeExecutorPluginSpec extends Specification {
         String[] command = ["ls","-lrt"]
         def logger = Mock(ExecutionLogger)
         def example = new SSHJNodeExecutorPlugin()
-        def context = getContext(logger,false)
+        def context = getContext(Mock(IFramework),logger,false)
         def node = Mock(INodeEntry){
             getNodename()>>"test"
             getAttributes()>>["hostname":"Test","osFamily":"linux"]

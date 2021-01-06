@@ -68,6 +68,7 @@ task copyToLib(type: Copy) {
 
 
 jar {
+    from sourceSets.main.allSource
     from "$buildDir/output"
     manifest {
         def libList = configurations.pluginLibs.collect{'lib/'+it.name}.join(' ')

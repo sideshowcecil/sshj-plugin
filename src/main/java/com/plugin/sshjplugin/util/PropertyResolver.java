@@ -18,9 +18,9 @@ public class PropertyResolver {
     private ExecutionContext context;
     private IRundeckProject frameworkProject;
 
-    public PropertyResolver(INodeEntry node, IFramework framework, ExecutionContext context) {
+    public PropertyResolver(INodeEntry node, ExecutionContext context) {
         this.node = node;
-        this.framework = framework;
+        this.framework = context.getIFramework();
         this.context = context;
         this.frameworkProject = framework.getFrameworkProjectMgr().getFrameworkProject(
                 context.getFrameworkProject());

@@ -101,14 +101,8 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, Describable {
     public static final String CON_TIMEOUT_MESSAGE =
             "Connection timeout.";
 
-    private Framework framework;
-
 
     public SSHJNodeExecutorPlugin() {}
-    public SSHJNodeExecutorPlugin(Framework framework) {
-        this.framework = framework;
-    }
-
 
     public static final Property SSH_AUTH_TYPE_PROP = PropertyUtil.select(CONFIG_AUTHENTICATION, "SSH Authentication",
             "Type of SSH Authentication to use",
@@ -223,7 +217,7 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, Describable {
 
         final ExecutionListener listener = context.getExecutionListener();
 
-        SSHJConnectionParameters connectionInfo = new SSHJConnectionParameters(node, context.getIFramework(), context);
+        SSHJConnectionParameters connectionInfo = new SSHJConnectionParameters(node, context);
 
         long contimeout = connectionInfo.getConnectTimeout();
         long commandtimeout = connectionInfo.getCommandTimeout();

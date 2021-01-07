@@ -67,13 +67,7 @@ public class SSHJFileCopierPlugin extends BaseFileCopier implements MultiFileCop
 
 
 
-    private Framework framework;
-
     public SSHJFileCopierPlugin() {
-    }
-
-    public SSHJFileCopierPlugin(Framework framework) {
-        this.framework = framework;
     }
 
     @Override
@@ -118,8 +112,8 @@ public class SSHJFileCopierPlugin extends BaseFileCopier implements MultiFileCop
                     context.getDataContext().get("job").get("execid") : null;
             remotefile = generateRemoteFilepathForNode(
                     node,
-                    context.getFramework().getFrameworkProjectMgr().getFrameworkProject(context.getFrameworkProject()),
-                    context.getFramework(),
+                    context.getIFramework().getFrameworkProjectMgr().getFrameworkProject(context.getFrameworkProject()),
+                    context.getIFramework(),
                     (null != scriptfile ? scriptfile.getName() : "dispatch-script"),
                     null,
                     identity
@@ -139,7 +133,7 @@ public class SSHJFileCopierPlugin extends BaseFileCopier implements MultiFileCop
                         );
 
         SSHJScp scp;
-        SSHJConnectionParameters connectionInfo = new SSHJConnectionParameters(node, framework, context);
+        SSHJConnectionParameters connectionInfo = new SSHJConnectionParameters(node, context);
 
         try {
             if (null != scriptfile && scriptfile.isDirectory()) {
@@ -198,7 +192,7 @@ public class SSHJFileCopierPlugin extends BaseFileCopier implements MultiFileCop
         }
 
         final SSHJScp scp;
-        final SSHJConnectionParameters connectionInfo = new SSHJConnectionParameters(node, framework, context);
+        final SSHJConnectionParameters connectionInfo = new SSHJConnectionParameters(node, context);
 
 
         try {

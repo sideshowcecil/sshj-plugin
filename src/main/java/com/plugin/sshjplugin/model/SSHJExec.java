@@ -111,7 +111,7 @@ public class SSHJExec extends SSHJBase implements SSHJEnvironments{
                         .copy();
 
 
-                //cmd.join(commandTimeout, TimeUnit.SECONDS);
+                cmd.close();
                 exitStatus = cmd.getExitStatus();
 
             }

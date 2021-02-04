@@ -110,8 +110,7 @@ public class SSHJExec extends SSHJBase implements SSHJEnvironments{
                         .keepFlushing(true)
                         .copy();
 
-
-                //cmd.join(commandTimeout, TimeUnit.SECONDS);
+                cmd.close();
                 exitStatus = cmd.getExitStatus();
 
             }

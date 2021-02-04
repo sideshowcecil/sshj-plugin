@@ -7,9 +7,9 @@ import com.dtolabs.rundeck.core.execution.ExecutionListener;
 import com.dtolabs.rundeck.core.execution.service.NodeExecutor;
 import com.dtolabs.rundeck.core.execution.service.NodeExecutorResult;
 import com.dtolabs.rundeck.core.execution.service.NodeExecutorResultImpl;
+import com.dtolabs.rundeck.core.execution.utils.ResolverUtil;
 import com.dtolabs.rundeck.core.execution.workflow.steps.FailureReason;
 import com.dtolabs.rundeck.core.execution.workflow.steps.StepFailureReason;
-import com.dtolabs.rundeck.core.execution.workflow.steps.node.NodeStepFailureReason;
 import com.dtolabs.rundeck.core.plugins.Plugin;
 import com.dtolabs.rundeck.core.plugins.configuration.*;
 import com.dtolabs.rundeck.plugins.ServiceNameConstants;
@@ -22,7 +22,6 @@ import com.plugin.sshjplugin.model.SSHJExec;
 import net.schmizz.sshj.SSHClient;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 
@@ -83,6 +82,9 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, Describable {
     public static final String PROJ_PROP_RETRY_COUNTER = PROJ_PROP_PREFIX + NODE_ATTR_RETRY_COUNTER;
     public static final String FWK_PROP_RETRY_ENABLE = FWK_PROP_PREFIX + NODE_ATTR_RETRY_ENABLE;
     public static final String PROJ_PROP_RETRY_ENABLE = PROJ_PROP_PREFIX + NODE_ATTR_RETRY_ENABLE;
+    public static final String NODE_ATTR_ESCAPED_COMMAND = "non-escaped-command";
+    public static final String FWK_PROP_ESCAPED_COMMAND = FWK_PROP_PREFIX + NODE_ATTR_ESCAPED_COMMAND;
+    public static final String PROJ_PROP_ESCAPED_COMMAND = PROJ_PROP_PREFIX + NODE_ATTR_ESCAPED_COMMAND;
 
     public static final String SUDO_OPT_PREFIX = "sudo-";
 
@@ -94,6 +96,7 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, Describable {
 
     public static final String FRAMEWORK_SSH_COMMAND_TIMEOUT_PROP = "framework.ssh.command.timeout";
     public static final String FRAMEWORK_SSH_CONNECT_TIMEOUT_PROP = "framework.ssh.connect.timeout";
+    public static final String CONFIG_ESCAPED_COMMAND = "non-escaped-command";
 
     public static final String COMMAND_TIMEOUT_MESSAGE =
             "Timeout period exceeded, connection dropped.";
@@ -160,6 +163,11 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, Describable {
     static final Property SSH_RETRY_ENABLE = PropertyUtil.bool(CONFIG_RETRY_ENABLE, "Enable retry on fail?",
             "Enable a connection retry when the connection fails",
             false, "false");
+
+    public static final Property ALLOW_NON_ESCAPED_COMMANDS = PropertyUtil.bool(CONFIG_ESCAPED_COMMAND, "Allow unsecure non escaped commands",
+            "Commands with options replaced will not be executed as literal",
+            false, "false");
+
     /**
      * Overriding this method gives the plugin a chance to take part in building the {@link
      * com.dtolabs.rundeck.core.plugins.configuration.Description} presented by this plugin.  This subclass can use the
@@ -181,6 +189,7 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, Describable {
         builder.property(SSH_KEEP_ALIVE_INTERVAL);
         builder.property(SSH_RETRY_ENABLE);
         builder.property(SSH_RETRY_COUNTER);
+        builder.property(ALLOW_NON_ESCAPED_COMMANDS);
 
         //mapping config input on project and framework level
         builder.mapping(CONFIG_KEYPATH, PROJ_PROP_SSH_KEYPATH);
@@ -203,8 +212,28 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, Describable {
         builder.frameworkMapping(CONFIG_RETRY_COUNTER, FWK_PROP_RETRY_COUNTER);
         builder.mapping(CONFIG_RETRY_ENABLE, PROJ_PROP_RETRY_ENABLE);
         builder.frameworkMapping(CONFIG_RETRY_ENABLE, FWK_PROP_RETRY_ENABLE);
+        builder.mapping(CONFIG_ESCAPED_COMMAND, PROJ_PROP_ESCAPED_COMMAND);
+        builder.frameworkMapping(CONFIG_ESCAPED_COMMAND, FWK_PROP_ESCAPED_COMMAND);
 
         return builder.build();
+    }
+
+    private String[] cleanCommands(String[] commands, boolean escapeCommand){
+        String[] cleanCommands = new String[commands.length];
+        int i = 0;
+        if(!escapeCommand){
+            return commands;
+        }
+        for (String commandPiece: commands) {
+            if(commandPiece.contains("*") && commandPiece.contains("'")){
+                commandPiece = StringUtils.removeStart(commandPiece, "'");
+                commandPiece = StringUtils.removeEnd(commandPiece, "'");
+            }
+            cleanCommands[i] = commandPiece;
+            i++;
+        }
+
+        return cleanCommands;
     }
 
     @Override
@@ -225,11 +254,16 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, Describable {
 
         long contimeout = connectionInfo.getConnectTimeout();
         long commandtimeout = connectionInfo.getCommandTimeout();
+        boolean escapeCommand = ResolverUtil.resolveBooleanProperty(CONFIG_ESCAPED_COMMAND, false,
+                node, framework.getFrameworkProjectMgr().getFrameworkProject(
+                        context.getFrameworkProject()),
+                framework);
 
+        String[] cleanedCommands = cleanCommands(command, escapeCommand);
         SSHJExec sshexec = null;
         try {
             sshexec = SSHJBuilder.build(node,
-                    command,
+                    cleanedCommands,
                     context.getDataContext(),
                     connectionInfo,
                     listener);

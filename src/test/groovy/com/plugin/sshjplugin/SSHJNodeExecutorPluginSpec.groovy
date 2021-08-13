@@ -80,7 +80,7 @@ class SSHJNodeExecutorPluginSpec extends Specification {
 
 
         }
-        def example = new SSHJNodeExecutorPlugin(framework)
+        def example = new SSHJNodeExecutorPlugin()
 
 
         /*

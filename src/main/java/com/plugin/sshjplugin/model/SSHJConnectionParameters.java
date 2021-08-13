@@ -22,10 +22,10 @@ public class SSHJConnectionParameters implements SSHJConnection{
     private ExecutionContext context;
     private PropertyResolver propertyResolver;
 
-    public SSHJConnectionParameters(INodeEntry node, Framework framework, ExecutionContext context) {
+    public SSHJConnectionParameters(INodeEntry node, ExecutionContext context) {
         this.node = node;
         this.context = context;
-        this.framework = framework;
+        this.framework = context.getFramework();
 
         propertyResolver = new PropertyResolver(node, framework, context);
     }

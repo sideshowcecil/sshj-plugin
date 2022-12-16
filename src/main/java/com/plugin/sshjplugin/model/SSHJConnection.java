@@ -1,6 +1,7 @@
 package com.plugin.sshjplugin.model;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 public interface SSHJConnection{
@@ -14,7 +15,11 @@ public interface SSHJConnection{
 
     AuthenticationType getAuthenticationType();
 
-    String getPrivateKeyPath() throws IOException;
+    String getPrivateKeyStoragePath() throws IOException;
+
+    InputStream getPrivateKeyStorageData(String path);
+
+    String getPrivateKeyfilePath();
 
     String getPasswordStoragePath();
 

@@ -5,6 +5,8 @@ import com.dtolabs.rundeck.core.common.Framework;
 import com.dtolabs.rundeck.core.common.INodeEntry;
 import com.dtolabs.rundeck.core.execution.ExecutionContext;
 import com.dtolabs.rundeck.core.execution.impl.common.BaseFileCopier;
+import com.dtolabs.rundeck.core.execution.proxy.ProxySecretBundleCreator;
+import com.dtolabs.rundeck.core.execution.proxy.SecretBundle;
 import com.dtolabs.rundeck.core.execution.script.ScriptfileUtils;
 import com.dtolabs.rundeck.core.execution.service.FileCopierException;
 import com.dtolabs.rundeck.core.execution.service.MultiFileCopier;
@@ -18,6 +20,7 @@ import com.dtolabs.rundeck.plugins.descriptions.PluginDescription;
 import com.dtolabs.rundeck.plugins.util.DescriptionBuilder;
 import com.plugin.sshjplugin.model.SSHJConnectionParameters;
 import com.plugin.sshjplugin.model.SSHJScp;
+import com.plugin.sshjplugin.util.SSHJSecretBundleUtil;
 import net.schmizz.sshj.SSHClient;
 
 import java.io.File;
@@ -28,7 +31,7 @@ import java.util.List;
 
 @Plugin(service = ServiceNameConstants.FileCopier, name = SSHJFileCopierPlugin.SERVICE_PROVIDER_NAME)
 @PluginDescription(title = SSHJFileCopierPlugin.SERVICE_TITLE, description = SSHJFileCopierPlugin.SERVICE_DESCRIPCION)
-public class SSHJFileCopierPlugin extends BaseFileCopier implements MultiFileCopier, Describable {
+public class SSHJFileCopierPlugin extends BaseFileCopier implements MultiFileCopier, ProxySecretBundleCreator, Describable {
 
     public static final String SERVICE_TITLE = "SSHJ-SCP";
     public static final String SERVICE_DESCRIPCION = "File Copier using SSHJ library";
@@ -227,5 +230,10 @@ public class SSHJFileCopierPlugin extends BaseFileCopier implements MultiFileCop
         ArrayList<String> ret = new ArrayList<>();
         return ret.toArray(new String[0]);
 
+    }
+
+    @Override
+    public SecretBundle prepareSecretBundle(ExecutionContext context, INodeEntry node) {
+        return SSHJSecretBundleUtil.createBundle(context, node);
     }
 }

@@ -40,35 +40,36 @@ public class SSHJConnectionParameters implements SSHJConnection{
     }
 
     @Override
-    public String getPrivateKeyPath() throws IOException {
-        String privateKeyFile;
-        InputStream sshKey = propertyResolver.getPrivateKeyStorageData(SSHJNodeExecutorPlugin.NODE_ATTR_SSH_KEY_RESOURCE);
+    public String getPrivateKeyStoragePath() throws IOException {
 
-        if(sshKey != null){
+        String path = propertyResolver.resolve(SSHJNodeExecutorPlugin.NODE_ATTR_SSH_KEY_RESOURCE);
+        if (path == null && framework.hasProperty(Constants.SSH_KEYRESOURCE_PROP)) {
+            //return default framework level
+            path = framework.getProperty(Constants.SSH_KEYRESOURCE_PROP);
+        }
+        //expand properties in path
+        if (path != null && path.contains("${")) {
+            path = DataContextUtils.replaceDataReferencesInString(path, context.getDataContext());
+        }
+        return path;
 
-            File tempFile = File.createTempFile("tmp", "key");
-            tempFile.deleteOnExit();
-            FileOutputStream tmpKey = new FileOutputStream(tempFile);
-            org.apache.commons.io.IOUtils.copy(sshKey, tmpKey);
 
-            String sshKeyResource = "";
+    }
 
-            context.getExecutionListener().log(3, "[sshj-debug] Using ssh key storage path: " + sshKeyResource);
-            context.getExecutionListener().log(3, "[sshj-debug] Loading key from storage path: " + tempFile.getAbsolutePath());
-            privateKeyFile = tempFile.getAbsolutePath();
-
-        }else{
-
-            privateKeyFile = getPrivateKeyfilePath();
-            context.getExecutionListener().log(3, "[sshj-debug] Using ssh keyfile: " + privateKeyFile);
+    @Override
+    public InputStream getPrivateKeyStorageData(String path){
+        try {
+            InputStream sshKey = propertyResolver.getPrivateKeyStorageData(path);
+            return sshKey;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
-
-        return privateKeyFile;
     }
 
 
-    String getPrivateKeyfilePath() {
+    @Override
+    public String getPrivateKeyfilePath() {
         String path = propertyResolver.resolve(SSHJNodeExecutorPlugin.NODE_ATTR_SSH_KEYPATH);
         if (path == null && framework.hasProperty(Constants.SSH_KEYPATH_PROP)) {
             //return default framework level

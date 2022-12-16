@@ -2,16 +2,20 @@ package com.plugin.sshjplugin.model;
 import com.dtolabs.rundeck.plugins.PluginLogger;
 import com.plugin.sshjplugin.SSHJBuilder;
 import net.schmizz.sshj.SSHClient;
+import net.schmizz.sshj.common.Factory;
+import net.schmizz.sshj.userauth.keyprovider.FileKeyProvider;
+import net.schmizz.sshj.userauth.keyprovider.KeyFormat;
 import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
-import java.io.File;
-import java.io.IOException;
+import net.schmizz.sshj.userauth.keyprovider.KeyProviderUtil;
+import net.schmizz.sshj.userauth.password.PasswordUtils;
+
+import java.io.*;
 
 public class SSHJAuthentication {
 
     SSHJConnection.AuthenticationType authenticationType;
     String username;
     String password;
-    String privateKeyFile;
     String passphrase;
     PluginLogger logger;
     SSHJConnection connectionParameters;
@@ -28,32 +32,51 @@ public class SSHJAuthentication {
 
         switch (authenticationType) {
             case privateKey:
-                try{
-                    privateKeyFile = connectionParameters.getPrivateKeyPath();
-                } catch (IOException e) {
-                    logger.log(0, "Failed to get SSH key: " + e.getMessage());
-                }
 
+                String privateKeyFile = connectionParameters.getPrivateKeyfilePath();
+                String privateKeyStoragePath = connectionParameters.getPrivateKeyStoragePath();
                 String passphrasePath = connectionParameters.getPrivateKeyPassphraseStoragePath();
+
+                KeyProvider key = null;
+
                 try{
                     passphrase = connectionParameters.getPrivateKeyPassphrase(passphrasePath);
                 } catch (IOException e) {
                     logger.log(0, "Failed to read SSH Passphrase stored at path: " + passphrasePath);
                 }
 
-                KeyProvider key = null;
+                if(privateKeyStoragePath!=null && !privateKeyStoragePath.isEmpty()){
+                    try{
+
+                        InputStream privateKey = connectionParameters.getPrivateKeyStorageData(privateKeyStoragePath);
+                        KeyFormat format = KeyProviderUtil.detectKeyFileFormat(new InputStreamReader(privateKey),true);
+                        FileKeyProvider privateKeyProvider = Factory.Named.Util.create(ssh.getTransport().getConfig().getFileKeyProviderFactories(), format.toString());
+
+                        if(passphrase == null){
+                            privateKeyProvider.init(new InputStreamReader(privateKey), null);
+                        }else{
+                            privateKeyProvider.init(new InputStreamReader(privateKey), PasswordUtils.createOneOff(passphrase.toCharArray()));
+                        }
+
+                        key = (KeyProvider) privateKey;
+
+                    } catch (IOException e) {
+                        logger.log(0, "Failed to get SSH key: " + e.getMessage());
+                    }
+                }
+
                 if (null != privateKeyFile && !"".equals(privateKeyFile)) {
                     if (!new File(privateKeyFile).exists()) {
                         throw new SSHJBuilder.BuilderException("SSH Keyfile does not exist: " + privateKeyFile);
                     }
                     logger.log(3, "[sshj-debug] Using ssh keyfile: " + privateKeyFile);
+                    if (passphrase == null) {
+                        key = ssh.loadKeys(privateKeyFile);
+                    } else {
+                        key = ssh.loadKeys(privateKeyFile, passphrase);
+                    }
                 }
 
-                if (passphrase == null) {
-                    key = ssh.loadKeys(privateKeyFile);
-                } else {
-                    key = ssh.loadKeys(privateKeyFile, passphrase);
-                }
                 ssh.authPublickey(username, key);
                 break;
             case password:

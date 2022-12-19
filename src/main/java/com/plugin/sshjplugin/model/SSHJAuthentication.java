@@ -46,10 +46,11 @@ public class SSHJAuthentication {
                 }
 
                 if(privateKeyStoragePath!=null && !privateKeyStoragePath.isEmpty()){
-                    try{
 
-                        InputStream privateKey = connectionParameters.getPrivateKeyStorageData(privateKeyStoragePath);
-                        KeyFormat format = KeyProviderUtil.detectKeyFileFormat(new InputStreamReader(privateKey),true);
+                    try (InputStream privateKey = connectionParameters.getPrivateKeyStorageData(privateKeyStoragePath);
+                         InputStreamReader privateKeyReader = new InputStreamReader(privateKey)){
+
+                        KeyFormat format = KeyProviderUtil.detectKeyFileFormat(privateKeyReader,true);
                         FileKeyProvider privateKeyProvider = Factory.Named.Util.create(ssh.getTransport().getConfig().getFileKeyProviderFactories(), format.toString());
 
                         if(passphrase == null){
@@ -57,10 +58,8 @@ public class SSHJAuthentication {
                         }else{
                             privateKeyProvider.init(new InputStreamReader(privateKey), PasswordUtils.createOneOff(passphrase.toCharArray()));
                         }
-
                         key = (KeyProvider) privateKey;
-
-                    } catch (IOException e) {
+                    } catch (Exception e) {
                         logger.log(0, "Failed to get SSH key: " + e.getMessage());
                     }
                 }

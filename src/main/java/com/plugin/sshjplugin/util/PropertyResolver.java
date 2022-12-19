@@ -47,8 +47,13 @@ public class PropertyResolver {
         );
     }
 
-    public InputStream getPrivateKeyStorageData(String property) throws IOException {
+    public InputStream getPrivateKeyStorageFromProperty(String property) throws IOException {
         String path = resolve(property);
+        return getPrivateKeyStorageData(path);
+
+    }
+
+    public InputStream getPrivateKeyStorageData(String path) throws IOException {
         //expand properties in path
         if (path != null && path.contains("${")) {
             path = DataContextUtils.replaceDataReferencesInString(path, context.getDataContext());

@@ -15,11 +15,11 @@ public interface SSHJConnection{
 
     AuthenticationType getAuthenticationType();
 
+    String getPrivateKeyPath() throws IOException;
+
     String getPrivateKeyStoragePath() throws IOException;
 
     InputStream getPrivateKeyStorageData(String path);
-
-    String getPrivateKeyfilePath();
 
     String getPasswordStoragePath();
 

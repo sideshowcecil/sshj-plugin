@@ -40,6 +40,34 @@ public class SSHJConnectionParameters implements SSHJConnection{
     }
 
     @Override
+    public String getPrivateKeyPath() throws IOException {
+        String privateKeyFile;
+        InputStream sshKey = propertyResolver.getPrivateKeyStorageFromProperty(SSHJNodeExecutorPlugin.NODE_ATTR_SSH_KEY_RESOURCE);
+
+        if(sshKey != null){
+
+            File tempFile = File.createTempFile("tmp", "key");
+            tempFile.deleteOnExit();
+            FileOutputStream tmpKey = new FileOutputStream(tempFile);
+            org.apache.commons.io.IOUtils.copy(sshKey, tmpKey);
+
+            String sshKeyResource = "";
+
+            context.getExecutionListener().log(3, "[sshj-debug] Using ssh key storage path: " + sshKeyResource);
+            context.getExecutionListener().log(3, "[sshj-debug] Loading key from storage path: " + tempFile.getAbsolutePath());
+            privateKeyFile = tempFile.getAbsolutePath();
+
+        }else{
+
+            privateKeyFile = getPrivateKeyfilePath();
+            context.getExecutionListener().log(3, "[sshj-debug] Using ssh keyfile: " + privateKeyFile);
+        }
+
+
+        return privateKeyFile;
+    }
+
+    @Override
     public String getPrivateKeyStoragePath() throws IOException {
 
         String path = propertyResolver.resolve(SSHJNodeExecutorPlugin.NODE_ATTR_SSH_KEY_RESOURCE);
@@ -52,8 +80,6 @@ public class SSHJConnectionParameters implements SSHJConnection{
             path = DataContextUtils.replaceDataReferencesInString(path, context.getDataContext());
         }
         return path;
-
-
     }
 
     @Override
@@ -67,9 +93,7 @@ public class SSHJConnectionParameters implements SSHJConnection{
 
     }
 
-
-    @Override
-    public String getPrivateKeyfilePath() {
+    String getPrivateKeyfilePath() {
         String path = propertyResolver.resolve(SSHJNodeExecutorPlugin.NODE_ATTR_SSH_KEYPATH);
         if (path == null && framework.hasProperty(Constants.SSH_KEYPATH_PROP)) {
             //return default framework level

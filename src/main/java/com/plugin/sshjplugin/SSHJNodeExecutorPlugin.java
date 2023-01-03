@@ -4,6 +4,8 @@ import com.dtolabs.rundeck.core.common.Framework;
 import com.dtolabs.rundeck.core.common.INodeEntry;
 import com.dtolabs.rundeck.core.execution.ExecutionContext;
 import com.dtolabs.rundeck.core.execution.ExecutionListener;
+import com.dtolabs.rundeck.core.execution.proxy.ProxySecretBundleCreator;
+import com.dtolabs.rundeck.core.execution.proxy.SecretBundle;
 import com.dtolabs.rundeck.core.execution.service.NodeExecutor;
 import com.dtolabs.rundeck.core.execution.service.NodeExecutorResult;
 import com.dtolabs.rundeck.core.execution.service.NodeExecutorResultImpl;
@@ -19,6 +21,7 @@ import com.dtolabs.rundeck.plugins.util.PropertyBuilder;
 import com.plugin.sshjplugin.model.SSHJConnection;
 import com.plugin.sshjplugin.model.SSHJConnectionParameters;
 import com.plugin.sshjplugin.model.SSHJExec;
+import com.plugin.sshjplugin.util.SSHJSecretBundleUtil;
 import net.schmizz.sshj.SSHClient;
 import org.apache.commons.lang.StringUtils;
 
@@ -28,7 +31,7 @@ import java.util.Arrays;
 
 @Plugin(service = ServiceNameConstants.NodeExecutor, name = SSHJNodeExecutorPlugin.SERVICE_PROVIDER_NAME)
 @PluginDescription(title = SSHJNodeExecutorPlugin.SERVICE_TITLE, description = SSHJNodeExecutorPlugin.SERVICE_DESCRIPCION)
-public class SSHJNodeExecutorPlugin implements NodeExecutor, Describable {
+public class SSHJNodeExecutorPlugin implements NodeExecutor, ProxySecretBundleCreator, Describable {
 
     public static final String SERVICE_TITLE = "SSHJ-SSH";
     public static final String SERVICE_DESCRIPCION = "Node Executor using SSHJ library";
@@ -320,6 +323,11 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, Describable {
         return new ExtractFailure(errormsg, failureReason);
     }
 
+    @Override
+    public SecretBundle prepareSecretBundle(ExecutionContext context, INodeEntry node) {
+        return SSHJSecretBundleUtil.createBundle(context, node);
+    }
+
     static class ExtractFailure {
 
         private String errormsg;
@@ -338,4 +346,7 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, Describable {
             return reason;
         }
     }
+
+
+
 }

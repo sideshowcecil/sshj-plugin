@@ -12,11 +12,13 @@ import net.schmizz.sshj.connection.ConnectionException;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.transport.TransportException;
 
+import com.plugin.sshjplugin.util.DelegateOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SSHJExec extends SSHJBase implements SSHJEnvironments{
+
+public class SSHJExec extends SSHJBase implements SSHJEnvironments {
 
     private String command = null;
     private int exitStatus = -1;
@@ -45,7 +47,8 @@ public class SSHJExec extends SSHJBase implements SSHJEnvironments{
     public void execute(SSHClient ssh) {
         Session session = null;
         Session.Command cmd = null;
-        try {
+        try (DelegateOutputStream outputBuf = new DelegateOutputStream(System.out);
+                DelegateOutputStream errBuf = new DelegateOutputStream(System.err)){
             pluginLogger.log(3, "["+getPluginName()+"]  starting session" );
 
             session = ssh.startSession();
@@ -100,16 +103,16 @@ public class SSHJExec extends SSHJBase implements SSHJEnvironments{
 
                 SSHJPluginLoggerFactory sshjLogger = new SSHJPluginLoggerFactory(pluginLogger);
 
-                new StreamCopier(cmd.getInputStream(), System.out, sshjLogger)
+
+
+                new StreamCopier(cmd.getInputStream(), outputBuf, sshjLogger)
                         .bufSize(cmd.getLocalMaxPacketSize())
                         .keepFlushing(true)
                         .copy();
-
-                new StreamCopier(cmd.getErrorStream(), System.err, sshjLogger)
+                new StreamCopier(cmd.getErrorStream(), errBuf, sshjLogger)
                         .bufSize(cmd.getLocalMaxPacketSize())
                         .keepFlushing(true)
                         .copy();
-
 
                 cmd.close();
                 exitStatus = cmd.getExitStatus();

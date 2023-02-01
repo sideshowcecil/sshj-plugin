@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-
 public class SSHJExec extends SSHJBase implements SSHJEnvironments {
 
     private String command = null;
@@ -102,8 +101,6 @@ public class SSHJExec extends SSHJBase implements SSHJEnvironments {
                 pluginLogger.log(3, "["+getPluginName()+"]  capturing output" );
 
                 SSHJPluginLoggerFactory sshjLogger = new SSHJPluginLoggerFactory(pluginLogger);
-
-
 
                 new StreamCopier(cmd.getInputStream(), outputBuf, sshjLogger)
                         .bufSize(cmd.getLocalMaxPacketSize())

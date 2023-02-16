@@ -29,7 +29,9 @@ public class DelegateOutputStream extends OutputStream {
 
     @Override
     public void flush() throws IOException {
-        this.targetOutput.flush();
+        if(this.targetOutput != null){
+            this.targetOutput.flush();
+        }
         super.flush();
     }
 

@@ -15,9 +15,7 @@ public class SSHJSecretBundleUtil {
     public static SecretBundle createBundle(final ExecutionContext context, final INodeEntry node)  {
         try {
             DefaultSecretBundle secretBundle = new DefaultSecretBundle();
-            final SSHJConnectionParameters nodeAuthentication = new SSHJConnectionParameters(node, context.getFramework(),
-                    context
-            );
+            final SSHJConnectionParameters nodeAuthentication = new SSHJConnectionParameters(node,context);
             if(nodeAuthentication.getPasswordStoragePath() != null) {
                 secretBundle.addSecret(
                         nodeAuthentication.getPasswordStoragePath(),

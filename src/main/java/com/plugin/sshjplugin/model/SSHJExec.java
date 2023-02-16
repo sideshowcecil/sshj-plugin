@@ -11,7 +11,6 @@ import net.schmizz.sshj.common.StreamCopier;
 import net.schmizz.sshj.connection.ConnectionException;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.transport.TransportException;
-
 import com.plugin.sshjplugin.util.DelegateOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
@@ -51,7 +50,6 @@ public class SSHJExec extends SSHJBase implements SSHJEnvironments {
             pluginLogger.log(3, "["+getPluginName()+"]  starting session" );
 
             session = ssh.startSession();
-            session.allocateDefaultPTY();
 
             pluginLogger.log(3, "["+getPluginName()+"] setting environments" );
 
@@ -105,13 +103,13 @@ public class SSHJExec extends SSHJBase implements SSHJEnvironments {
                 new StreamCopier(cmd.getInputStream(), outputBuf, sshjLogger)
                         .bufSize(cmd.getLocalMaxPacketSize())
                         .keepFlushing(true)
-                        .copy();
+                        .spawn("stdout");
                 new StreamCopier(cmd.getErrorStream(), errBuf, sshjLogger)
                         .bufSize(cmd.getLocalMaxPacketSize())
                         .keepFlushing(true)
-                        .copy();
+                        .spawn("stderr");
 
-                cmd.close();
+                cmd.join();
                 exitStatus = cmd.getExitStatus();
 
             }

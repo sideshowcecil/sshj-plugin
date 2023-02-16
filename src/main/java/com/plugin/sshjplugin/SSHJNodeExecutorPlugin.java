@@ -11,7 +11,6 @@ import com.dtolabs.rundeck.core.execution.service.NodeExecutorResult;
 import com.dtolabs.rundeck.core.execution.service.NodeExecutorResultImpl;
 import com.dtolabs.rundeck.core.execution.workflow.steps.FailureReason;
 import com.dtolabs.rundeck.core.execution.workflow.steps.StepFailureReason;
-import com.dtolabs.rundeck.core.execution.workflow.steps.node.NodeStepFailureReason;
 import com.dtolabs.rundeck.core.plugins.Plugin;
 import com.dtolabs.rundeck.core.plugins.configuration.*;
 import com.dtolabs.rundeck.plugins.ServiceNameConstants;
@@ -22,10 +21,11 @@ import com.plugin.sshjplugin.model.SSHJConnection;
 import com.plugin.sshjplugin.model.SSHJConnectionParameters;
 import com.plugin.sshjplugin.model.SSHJExec;
 import com.plugin.sshjplugin.util.SSHJSecretBundleUtil;
+import net.schmizz.keepalive.KeepAliveProvider;
+import net.schmizz.sshj.DefaultConfig;
 import net.schmizz.sshj.SSHClient;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 
@@ -155,6 +155,13 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, ProxySecretBundleCr
     static final Property SSH_RETRY_ENABLE = PropertyUtil.bool(CONFIG_RETRY_ENABLE, "Enable retry on fail?",
             "Enable a connection retry when the connection fails",
             false, "false");
+
+    private SSHClient sshClient;
+
+    public void setSshClient(SSHClient sshClient) {
+        this.sshClient = sshClient;
+    }
+
     /**
      * Overriding this method gives the plugin a chance to take part in building the {@link
      * com.dtolabs.rundeck.core.plugins.configuration.Description} presented by this plugin.  This subclass can use the
@@ -236,10 +243,16 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, ProxySecretBundleCr
         FailureReason failureReason = null;
         String errormsg = null;
 
-        SSHClient connection = null;
+
         try {
-            connection = sshexec.connect();
-            sshexec.execute(connection);
+            if(sshClient ==null){
+                final DefaultConfig config = SSHJDefaultConfig.init().getConfig();
+                config.setLoggerFactory(new SSHJPluginLoggerFactory(listener));
+                config.setKeepAliveProvider(KeepAliveProvider.KEEP_ALIVE);
+                sshClient = new SSHClient(config);
+            }
+            sshexec.connect(sshClient);
+            sshexec.execute(sshClient);
             success = true;
         } catch (Exception e) {
             final ExtractFailure extractJschFailure = extractFailure(e, node, commandtimeout, contimeout, context.getFramework());
@@ -254,10 +267,10 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, ProxySecretBundleCr
                     )
             );
         }finally {
-            if(connection != null){
+            if(sshClient != null){
                 try {
-                    connection.disconnect();
-                    connection.close();
+                    sshClient.disconnect();
+                    sshClient.close();
                 } catch (Exception iex) {
                     throw new SSHJBuilder.BuilderException(iex);
                 }

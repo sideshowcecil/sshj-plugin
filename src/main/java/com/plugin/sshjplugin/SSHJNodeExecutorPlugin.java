@@ -103,14 +103,6 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, ProxySecretBundleCr
     public static final String CON_TIMEOUT_MESSAGE =
             "Connection timeout.";
 
-    private Framework framework;
-
-
-    public SSHJNodeExecutorPlugin(Framework framework) {
-        this.framework = framework;
-    }
-
-
     public static final Property SSH_AUTH_TYPE_PROP = PropertyUtil.select(CONFIG_AUTHENTICATION, "SSH Authentication",
             "Type of SSH Authentication to use",
             true, SSHJConnection.AuthenticationType.privateKey.toString(), Arrays.asList(SSHJConnection.AuthenticationType.values()), null, null);
@@ -224,7 +216,7 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, ProxySecretBundleCr
 
         final ExecutionListener listener = context.getExecutionListener();
 
-        SSHJConnectionParameters connectionInfo = new SSHJConnectionParameters(node, framework, context);
+        SSHJConnectionParameters connectionInfo = new SSHJConnectionParameters(node, context);
 
         long contimeout = connectionInfo.getConnectTimeout();
         long commandtimeout = connectionInfo.getCommandTimeout();
@@ -250,7 +242,7 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, ProxySecretBundleCr
             sshexec.execute(connection);
             success = true;
         } catch (Exception e) {
-            final ExtractFailure extractJschFailure = extractFailure(e, node, commandtimeout, contimeout, framework);
+            final ExtractFailure extractJschFailure = extractFailure(e, node, commandtimeout, contimeout, context.getFramework());
             errormsg = extractJschFailure.getErrormsg();
             failureReason = extractJschFailure.getReason();
             context.getExecutionListener().log(

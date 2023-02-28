@@ -2,6 +2,7 @@
 
 ### Copy plugin before starts
 ```
+./gradlew build
 cp build/libs/sshj-plugin-0.1.X-SNAPSHOT.jar docker/rundeck/plugins
 ```
 

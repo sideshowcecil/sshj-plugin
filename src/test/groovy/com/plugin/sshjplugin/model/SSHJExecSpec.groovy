@@ -61,8 +61,12 @@ class SSHJExecSpec extends Specification{
         then:
         1 * client.startSession()>>session
         1 * session.exec(commandString) >> command
-        _ * command.getInputStream()
-        _ * command.getErrorStream()
+        _ * command.getInputStream()>>Mock(InputStream){
+            read()>>-1
+        }
+        _ * command.getErrorStream()>>Mock(InputStream){
+            read()>>-1
+        }
         1 * command.join()
         1 * command.getExitStatus()>>0
         1 * logger.log(3, "[sshj-ssh] exit status: 0")
@@ -116,8 +120,12 @@ class SSHJExecSpec extends Specification{
         then:
         1 * client.startSession()>>session
         1 * session.exec(commandString) >> command
-        _ * command.getInputStream()
-        _ * command.getErrorStream()
+        _ * command.getInputStream()>>Mock(InputStream){
+            read()>>-1
+        }
+        _ * command.getErrorStream()>>Mock(InputStream){
+            read()>>-1
+        }
         1 * command.join()
         1 * command.getExitStatus()>>1
         1 * logger.log(3, "[sshj-ssh] exit status: 1")

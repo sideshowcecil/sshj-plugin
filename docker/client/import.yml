@@ -1,0 +1,18 @@
+projects:
+  - name: sshj-demo
+    archive: projects/sshj-demo.rdproject.jar
+
+keys:
+  - path: node/node.key
+    type: privateKey
+    file: data/keys/id_rsa
+
+acls:
+  - name: healthck.aclpolicy
+    file: acls/healthck.aclpolicy
+  - name: system-healthcheck.aclpolicy
+    file: acls/system-healthcheck.aclpolicy
+
+users:
+  - username: alice
+    email: alice@rundeck.io

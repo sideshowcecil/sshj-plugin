@@ -103,11 +103,11 @@ public class SSHJExec extends SSHJBase implements SSHJEnvironments {
                 new StreamCopier(cmd.getInputStream(), outputBuf, sshjLogger)
                         .bufSize(cmd.getLocalMaxPacketSize())
                         .keepFlushing(true)
-                        .spawn("stdout");
+                        .spawn("stdout").await();
                 new StreamCopier(cmd.getErrorStream(), errBuf, sshjLogger)
                         .bufSize(cmd.getLocalMaxPacketSize())
                         .keepFlushing(true)
-                        .spawn("stderr");
+                        .spawn("stderr").await();
 
                 cmd.join();
                 exitStatus = cmd.getExitStatus();

@@ -12,9 +12,12 @@ import net.schmizz.sshj.connection.ConnectionException;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.transport.TransportException;
 import com.plugin.sshjplugin.util.DelegateOutputStream;
+
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import net.schmizz.concurrent.Event;
 
 public class SSHJExec extends SSHJBase implements SSHJEnvironments {
 
@@ -100,15 +103,17 @@ public class SSHJExec extends SSHJBase implements SSHJEnvironments {
 
                 SSHJPluginLoggerFactory sshjLogger = new SSHJPluginLoggerFactory(pluginLogger);
 
-                new StreamCopier(cmd.getInputStream(), outputBuf, sshjLogger)
+                Event<IOException> stdoutEvent = new StreamCopier(cmd.getInputStream(), outputBuf, sshjLogger)
                         .bufSize(cmd.getLocalMaxPacketSize())
                         .keepFlushing(true)
-                        .spawn("stdout").await();
-                new StreamCopier(cmd.getErrorStream(), errBuf, sshjLogger)
+                        .spawn("stdout");
+                Event<IOException> stderrEvent = new StreamCopier(cmd.getErrorStream(), errBuf, sshjLogger)
                         .bufSize(cmd.getLocalMaxPacketSize())
                         .keepFlushing(true)
-                        .spawn("stderr").await();
+                        .spawn("stderr");
 
+                stderrEvent.await();
+                stdoutEvent.await();
                 cmd.join();
                 exitStatus = cmd.getExitStatus();
 
@@ -123,7 +128,6 @@ public class SSHJExec extends SSHJBase implements SSHJEnvironments {
             pluginLogger.log(3, "["+getPluginName()+"] done" );
 
         } catch (IOException iex) {
-            iex.printStackTrace();
             pluginLogger.log(0, iex.getMessage());
             throw new SSHJBuilder.BuilderException(iex);
         } finally {

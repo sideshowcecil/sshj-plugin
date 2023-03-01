@@ -30,6 +30,8 @@ public class SSHJAuthentication {
             case privateKey:
                 try{
                     privateKeyFile = connectionParameters.getPrivateKeyPath();
+                    logger.log(3, "Authenticating using private key");
+
                 } catch (IOException e) {
                     logger.log(0, "Failed to get SSH key: " + e.getMessage());
                 }

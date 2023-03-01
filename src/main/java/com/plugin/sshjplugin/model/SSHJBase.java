@@ -58,7 +58,7 @@ public class SSHJBase {
         this.port = port;
     }
 
-    public SSHClient connect(){
+    public void connect(SSHClient ssh){
         pluginLogger.log(3, "["+ getPluginName()+"] init SSHJDefaultConfig" );
         int connectTimeout = sshjConnection.getConnectTimeout();
         int commandTimeout = sshjConnection.getCommandTimeout();
@@ -67,13 +67,7 @@ public class SSHJBase {
         int retryCount = sshjConnection.getRetryCounter();
 
         SSHJAuthentication authentication = new SSHJAuthentication(sshjConnection, pluginLogger);
-        final DefaultConfig config = SSHJDefaultConfig.init().getConfig();
-        config.setLoggerFactory(new SSHJPluginLoggerFactory(pluginLogger));
-        config.setKeepAliveProvider(KeepAliveProvider.KEEP_ALIVE);
 
-        pluginLogger.log(3, "["+getPluginName()+"] init SSHClient" );
-
-        SSHClient ssh = new SSHClient(config);
         pluginLogger.log(3, "["+getPluginName()+"] setting timeouts" );
         pluginLogger.log(3, "["+getPluginName()+"] getConnectTimeout timeout: " + connectTimeout);
         pluginLogger.log(3, "["+getPluginName()+"] getTimeout timeout: " + commandTimeout);
@@ -82,8 +76,6 @@ public class SSHJBase {
         pluginLogger.log(3, "["+getPluginName()+"] retryCount: " + retryCount);
 
         ssh.getTransport().getConfig().setLoggerFactory(new SSHJPluginLoggerFactory(pluginLogger));
-
-
         ssh.addHostKeyVerifier(new PromiscuousVerifier());
         ssh.setConnectTimeout(connectTimeout);
         ssh.setTimeout(commandTimeout);
@@ -125,7 +117,6 @@ public class SSHJBase {
                 if (ssh.isConnected()) {
                     pluginLogger.log(3, "["+getPluginName()+"] connection done");
                     connectionNumber++;
-                    return ssh;
                 }
 
             } catch (TransportException e) {
@@ -146,8 +137,6 @@ public class SSHJBase {
             count++;
 
         }
-
-        return null;
     }
 
 

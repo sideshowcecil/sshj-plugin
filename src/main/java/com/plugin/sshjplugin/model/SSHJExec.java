@@ -103,11 +103,11 @@ public class SSHJExec extends SSHJBase implements SSHJEnvironments {
 
                 SSHJPluginLoggerFactory sshjLogger = new SSHJPluginLoggerFactory(pluginLogger);
 
-                Event stdoutEvent = new StreamCopier(cmd.getInputStream(), outputBuf, sshjLogger)
+                Event<IOException> stdoutEvent = new StreamCopier(cmd.getInputStream(), outputBuf, sshjLogger)
                         .bufSize(cmd.getLocalMaxPacketSize())
                         .keepFlushing(true)
                         .spawn("stdout");
-                Event stderrEvent = new StreamCopier(cmd.getErrorStream(), errBuf, sshjLogger)
+                Event<IOException> stderrEvent = new StreamCopier(cmd.getErrorStream(), errBuf, sshjLogger)
                         .bufSize(cmd.getLocalMaxPacketSize())
                         .keepFlushing(true)
                         .spawn("stderr");
@@ -127,7 +127,7 @@ public class SSHJExec extends SSHJBase implements SSHJEnvironments {
             }
             pluginLogger.log(3, "["+getPluginName()+"] done" );
 
-        } catch (Throwable iex) {
+        } catch (IOException iex) {
             pluginLogger.log(0, iex.getMessage());
             throw new SSHJBuilder.BuilderException(iex);
         } finally {

@@ -9,6 +9,8 @@ import com.plugin.sshjplugin.model.SSHJConnectionParameters;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SSHJSecretBundleUtil {
 
@@ -49,6 +51,27 @@ public class SSHJSecretBundleUtil {
         } catch(IOException iex) {
             throw new RuntimeException("Unable to prepare secret bundle", iex);
         }
+    }
+
+    public static List<String> getSecretsPath(ExecutionContext context, INodeEntry node) {
+        List<String> listSecretsPath = new ArrayList<>();
+        final SSHJConnectionParameters nodeAuthentication = new SSHJConnectionParameters(node,context);
+
+        if(nodeAuthentication.getPasswordStoragePath() != null) {
+            listSecretsPath.add(nodeAuthentication.getPasswordStoragePath());
+        }
+        if(nodeAuthentication.getPrivateKeyPassphraseStoragePath() != null) {
+            listSecretsPath.add(nodeAuthentication.getPrivateKeyPassphraseStoragePath());
+        }
+        if(nodeAuthentication.getPrivateKeyStoragePath() != null) {
+            listSecretsPath.add(nodeAuthentication.getPrivateKeyStoragePath());
+        }
+
+        if(nodeAuthentication.getSudoPasswordStoragePath() != null) {
+            listSecretsPath.add(nodeAuthentication.getSudoPasswordStoragePath());
+        }
+
+        return listSecretsPath;
     }
 
 }

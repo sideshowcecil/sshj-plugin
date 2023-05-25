@@ -17,7 +17,7 @@ public interface SSHJConnection{
 
     String getPrivateKeyPath() throws IOException;
 
-    String getPrivateKeyStoragePath() throws IOException;
+    String getPrivateKeyStoragePath();
 
     InputStream getPrivateKeyStorageData(String path);
 
@@ -29,7 +29,7 @@ public interface SSHJConnection{
 
     String getSudoPassword(String path) throws IOException;
 
-    String getPrivateKeyPassphraseStoragePath() throws IOException;
+    String getPrivateKeyPassphraseStoragePath();
 
     String getPrivateKeyPassphrase(String path) throws IOException;
 

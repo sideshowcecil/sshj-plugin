@@ -243,4 +243,9 @@ public class SSHJFileCopierPlugin extends BaseFileCopier implements MultiFileCop
     public SecretBundle prepareSecretBundle(ExecutionContext context, INodeEntry node) {
         return SSHJSecretBundleUtil.createBundle(context, node);
     }
+
+    //@Override
+    public List<String> listSecretsPath(ExecutionContext context, INodeEntry node) {
+        return SSHJSecretBundleUtil.getSecretsPath(context, node);
+    }
 }

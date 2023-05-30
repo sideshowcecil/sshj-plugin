@@ -334,7 +334,7 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, ProxySecretBundleCr
         return SSHJSecretBundleUtil.createBundle(context, node);
     }
 
-    //@Override
+    @Override
     public List<String> listSecretsPath(ExecutionContext context, INodeEntry node) {
         return SSHJSecretBundleUtil.getSecretsPath(context, node);
     }

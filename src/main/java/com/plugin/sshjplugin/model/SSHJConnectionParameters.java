@@ -68,7 +68,7 @@ public class SSHJConnectionParameters implements SSHJConnection{
     }
 
     @Override
-    public String getPrivateKeyStoragePath() throws IOException {
+    public String getPrivateKeyStoragePath(){
 
         String path = propertyResolver.resolve(SSHJNodeExecutorPlugin.NODE_ATTR_SSH_KEY_RESOURCE);
         if (path == null && framework.hasProperty(Constants.SSH_KEYRESOURCE_PROP)) {
@@ -156,7 +156,7 @@ public class SSHJConnectionParameters implements SSHJConnection{
     }
 
     @Override
-    public String getPrivateKeyPassphraseStoragePath() throws IOException {
+    public String getPrivateKeyPassphraseStoragePath() {
         return propertyResolver.getStoragePath(SSHJNodeExecutorPlugin.NODE_ATTR_SSH_KEY_PASSPHRASE_STORAGE_PATH);
     }
 

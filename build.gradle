@@ -50,7 +50,7 @@ dependencies {
     pluginLibs group: 'commons-io', name: 'commons-io', version: '2.6', ext: 'jar'
     pluginLibs group: 'net.sf.expectit', name: 'expectit-core', version: '0.9.0'
 
-    implementation 'org.rundeck:rundeck-core:4.6.1-20220914'
+    implementation 'org.rundeck:rundeck-core:4.14.0-rc1-20230606'
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.26'
 
     testImplementation 'junit:junit:4.12'

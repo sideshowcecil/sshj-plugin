@@ -27,6 +27,7 @@ import net.schmizz.sshj.SSHClient;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Arrays;
+import java.util.List;
 
 
 @Plugin(service = ServiceNameConstants.NodeExecutor, name = SSHJNodeExecutorPlugin.SERVICE_PROVIDER_NAME)
@@ -331,6 +332,11 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, ProxySecretBundleCr
     @Override
     public SecretBundle prepareSecretBundle(ExecutionContext context, INodeEntry node) {
         return SSHJSecretBundleUtil.createBundle(context, node);
+    }
+
+    @Override
+    public List<String> listSecretsPath(ExecutionContext context, INodeEntry node) {
+        return SSHJSecretBundleUtil.getSecretsPath(context, node);
     }
 
     static class ExtractFailure {

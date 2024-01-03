@@ -94,6 +94,10 @@ public class SSHJBase {
             retryCount=0;
         }
 
+        if (keepAliveInterval != 0) {
+            ssh.getConnection().getKeepAlive().setKeepAliveInterval(keepAliveInterval);
+        }
+
         while(count <= retryCount) {
             try {
                 pluginLogger.log(3, "["+getPluginName()+"] open connection");
@@ -106,10 +110,6 @@ public class SSHJBase {
                 pluginLogger.log(3, "["+getPluginName()+"] connection done");
 
                 authentication.authenticate(ssh);
-
-                if (keepAliveInterval != 0) {
-                    ssh.getConnection().getKeepAlive().setKeepAliveInterval(keepAliveInterval); //every 60sec
-                }
 
                 pluginLogger.log(3, "["+getPluginName()+"]  authentication set");
 

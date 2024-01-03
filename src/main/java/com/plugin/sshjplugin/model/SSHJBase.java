@@ -4,7 +4,9 @@ import com.dtolabs.rundeck.plugins.PluginLogger;
 import com.plugin.sshjplugin.SSHJBuilder;
 import com.plugin.sshjplugin.SSHJDefaultConfig;
 import com.plugin.sshjplugin.SSHJPluginLoggerFactory;
+import net.schmizz.keepalive.KeepAlive;
 import net.schmizz.keepalive.KeepAliveProvider;
+import net.schmizz.keepalive.KeepAliveRunner;
 import net.schmizz.sshj.DefaultConfig;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.transport.TransportException;
@@ -63,6 +65,7 @@ public class SSHJBase {
         int connectTimeout = sshjConnection.getConnectTimeout();
         int commandTimeout = sshjConnection.getCommandTimeout();
         int keepAliveInterval = sshjConnection.getKeepAliveInterval();
+        int keepAliveCount = sshjConnection.getKeepAliveMaxAlive();
         boolean retry = sshjConnection.isRetryEnabled();
         int retryCount = sshjConnection.getRetryCounter();
 
@@ -72,6 +75,7 @@ public class SSHJBase {
         pluginLogger.log(3, "["+getPluginName()+"] getConnectTimeout timeout: " + connectTimeout);
         pluginLogger.log(3, "["+getPluginName()+"] getTimeout timeout: " + commandTimeout);
         pluginLogger.log(3, "["+getPluginName()+"] keepAliveInterval: " + keepAliveInterval);
+        pluginLogger.log(3, "["+getPluginName()+"] keepAliveMaxCount: " + keepAliveCount);
         pluginLogger.log(3, "["+getPluginName()+"] retry: " + retry);
         pluginLogger.log(3, "["+getPluginName()+"] retryCount: " + retryCount);
 
@@ -95,8 +99,15 @@ public class SSHJBase {
         }
 
         if (keepAliveInterval != 0) {
-            ssh.getConnection().getKeepAlive().setKeepAliveInterval(keepAliveInterval);
+            KeepAliveRunner keepAlive = (KeepAliveRunner)ssh.getConnection().getKeepAlive();
+            keepAlive.setKeepAliveInterval(keepAliveInterval);
+
+            if(keepAliveCount != 0){
+                keepAlive.setMaxAliveCount(keepAliveCount);
+            }
         }
+
+
 
         while(count <= retryCount) {
             try {

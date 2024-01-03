@@ -45,6 +45,9 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, ProxySecretBundleCr
     public static final String CONFIG_AUTHENTICATION = "authentication";
     public static final String CONFIG_PASSPHRASE_STORE_PATH = "passphrasestoragepath";
     public static final String CONFIG_KEEP_ALIVE_INTERVAL = "keepAliveInterval";
+
+    public static final String CONFIG_KEEP_ALIVE_MAX_ALIVE_COUNT = "keepAliveMaxAliveCount";
+
     public static final String CONFIG_RETRY_ENABLE = "retryEnable";
     public static final String CONFIG_RETRY_COUNTER = "retryCounter";
 
@@ -66,6 +69,9 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, ProxySecretBundleCr
     public static final String NODE_ATTR_SSH_KEY_PASSPHRASE_OPTION = "ssh-key-passphrase-option";
     public static final String NODE_ATTR_SUDO_PASSWORD_OPTION = "password-option";
     public static final String NODE_ATTR_SSH_KEEP_ALIVE = "keep-alive-interval";
+
+    public static final String NODE_ATTR_SSH_KEEP_MAX_ALIVE_COUNT = "keep-alive-max-alive-count";
+
     public static final String NODE_ATTR_RETRY_COUNTER = "retry-counter";
     public static final String NODE_ATTR_RETRY_ENABLE = "retry-enable";
 
@@ -82,7 +88,13 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, ProxySecretBundleCr
     public static final String FWK_PROP_SSH_KEY_PASSPHRASE_STORAGE_PATH = FWK_PROP_PREFIX + NODE_ATTR_SSH_KEY_PASSPHRASE_STORAGE_PATH;
     public static final String PROJ_PROP_SSH_KEY_PASSPHRASE_STORAGE_PATH = PROJ_PROP_PREFIX + NODE_ATTR_SSH_KEY_PASSPHRASE_STORAGE_PATH;
     public static final String FWK_PROP_SSH_KEEP_ALIVE = FWK_PROP_PREFIX + NODE_ATTR_SSH_KEEP_ALIVE;
+    public static final String FWK_PROP_SSH_KEEP_ALIVE_COUNT = FWK_PROP_PREFIX + NODE_ATTR_SSH_KEEP_MAX_ALIVE_COUNT;
+
+    public static final String FWK_PROP_SSH_KEEP_ALIVE_MAX_ALIVE_COUNT = FWK_PROP_PREFIX + NODE_ATTR_SSH_KEEP_MAX_ALIVE_COUNT;
+
     public static final String PROJ_PROP_SSH_KEEP_ALIVE = PROJ_PROP_PREFIX + NODE_ATTR_SSH_KEEP_ALIVE;
+    public static final String PROJ_PROP_SSH_KEEP_ALIVE_MAX_COUNT = PROJ_PROP_PREFIX + NODE_ATTR_SSH_KEEP_MAX_ALIVE_COUNT;
+
     public static final String FWK_PROP_RETRY_COUNTER = FWK_PROP_PREFIX + NODE_ATTR_RETRY_COUNTER;
     public static final String PROJ_PROP_RETRY_COUNTER = PROJ_PROP_PREFIX + NODE_ATTR_RETRY_COUNTER;
     public static final String FWK_PROP_RETRY_ENABLE = FWK_PROP_PREFIX + NODE_ATTR_RETRY_ENABLE;
@@ -146,8 +158,12 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, ProxySecretBundleCr
             .build();
 
     static final Property SSH_KEEP_ALIVE_INTERVAL = PropertyUtil.string(CONFIG_KEEP_ALIVE_INTERVAL, "Keep Alive Interval",
-            "Keep Alive Interval",
+            "Keep Alive Interval. Can be overridden by a Node attribute named 'keep-alive-interval'. ",
             false, null);
+
+    static final Property SSH_KEEP_ALIVE_MAX_ALIVE_COUNT = PropertyUtil.string(CONFIG_KEEP_ALIVE_MAX_ALIVE_COUNT, "Keep Alive Max Alive Count",
+            "Keep Alive Max Alive Count (default 5). Can be overridden by a Node attribute named 'keep-alive-max-alive-count'.",
+            false, "5");
 
     static final Property SSH_RETRY_COUNTER = PropertyUtil.string(CONFIG_RETRY_COUNTER, "Number of retries",
             "Set retries limit in case the connection fail (just for Transport Exceptions)",
@@ -182,6 +198,7 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, ProxySecretBundleCr
         builder.property(SSH_KEY_STORAGE_PROP);
         builder.property(SSH_PASSPHRASE_STORAGE_PROP);
         builder.property(SSH_KEEP_ALIVE_INTERVAL);
+        builder.property(SSH_KEEP_ALIVE_MAX_ALIVE_COUNT);
         builder.property(SSH_RETRY_ENABLE);
         builder.property(SSH_RETRY_COUNTER);
 
@@ -199,8 +216,8 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, ProxySecretBundleCr
         builder.mapping(CONFIG_KEEP_ALIVE_INTERVAL, PROJ_PROP_SSH_KEEP_ALIVE);
         builder.frameworkMapping(CONFIG_KEEP_ALIVE_INTERVAL, FWK_PROP_SSH_KEEP_ALIVE);
 
-        builder.mapping(CONFIG_KEEP_ALIVE_INTERVAL, PROJ_PROP_SSH_KEEP_ALIVE);
-        builder.frameworkMapping(CONFIG_KEEP_ALIVE_INTERVAL, FWK_PROP_SSH_KEEP_ALIVE);
+        builder.mapping(CONFIG_KEEP_ALIVE_MAX_ALIVE_COUNT, PROJ_PROP_SSH_KEEP_ALIVE_MAX_COUNT);
+        builder.frameworkMapping(CONFIG_KEEP_ALIVE_MAX_ALIVE_COUNT, FWK_PROP_SSH_KEEP_ALIVE_COUNT);
 
         builder.mapping(CONFIG_RETRY_COUNTER, PROJ_PROP_RETRY_COUNTER);
         builder.frameworkMapping(CONFIG_RETRY_COUNTER, FWK_PROP_RETRY_COUNTER);

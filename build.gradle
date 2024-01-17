@@ -7,7 +7,7 @@ defaultTasks 'clean','build'
 apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'idea'
-sourceCompatibility = 1.8
+sourceCompatibility = 1.11
 ext.rundeckPluginVersion= '1.2'
 ext.rundeckVersion= '3.3.x'
 ext.pluginClassNames='com.plugin.sshjplugin.SSHJNodeExecutorPlugin,com.plugin.sshjplugin.SSHJFileCopierPlugin'
@@ -50,7 +50,7 @@ dependencies {
     pluginLibs group: 'commons-io', name: 'commons-io', version: '2.6', ext: 'jar'
     pluginLibs group: 'net.sf.expectit', name: 'expectit-core', version: '0.9.0'
 
-    implementation 'org.rundeck:rundeck-core:4.14.0-rc1-20230606'
+    implementation 'org.rundeck:rundeck-core:5.0.1-20240115'
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.26'
 
     testImplementation 'junit:junit:4.12'

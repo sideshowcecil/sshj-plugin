@@ -2,7 +2,6 @@ package com.plugin.sshjplugin;
 
 import com.dtolabs.rundeck.core.common.INodeEntry;
 import com.dtolabs.rundeck.core.dispatcher.DataContextUtils;
-import com.dtolabs.rundeck.core.tasks.net.SSHTaskBuilder;
 import com.dtolabs.rundeck.plugins.PluginLogger;
 import com.plugin.sshjplugin.model.*;
 import org.apache.commons.lang.StringUtils;
@@ -114,7 +113,7 @@ public class SSHJBuilder {
             final String remotePath,
             final SSHJConnection sshConnection, final PluginLogger logger
     ) throws
-            SSHTaskBuilder.BuilderException {
+            Exception {
 
 
         final SSHJScp scp = new SSHJScp();
@@ -131,10 +130,10 @@ public class SSHJBuilder {
             final SSHJConnection sshConnection,
             final PluginLogger logger
     ) throws
-            SSHTaskBuilder.BuilderException {
+            Exception {
 
         if (null == files || files.size() == 0) {
-            throw new SSHTaskBuilder.BuilderException("files was not set");
+            throw new Exception("files was not set");
         }
 
         if (null == remotePath) {

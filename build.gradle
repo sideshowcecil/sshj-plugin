@@ -1,19 +1,24 @@
 plugins {
     id 'pl.allegro.tech.build.axion-release' version '1.14.3'
     id 'java'
+    id 'maven-publish'
 }
 
 defaultTasks 'clean','build'
 apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'idea'
-sourceCompatibility = 1.11
+
 ext.rundeckPluginVersion= '1.2'
 ext.rundeckVersion= '3.3.x'
 ext.pluginClassNames='com.plugin.sshjplugin.SSHJNodeExecutorPlugin,com.plugin.sshjplugin.SSHJFileCopierPlugin'
 ext.pluginName = 'SSHJ Plugin'
 ext.pluginDescription ='SSH Node Executor and File Copier plugin based on SSHJ library.'
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
 
 scmVersion {
     ignoreUncommittedChanges = true
@@ -90,3 +95,12 @@ jar {
 //set jar task to depend on copyToLib
 jar.dependsOn(copyToLib)
 
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifactId = 'jq-json-logfilter'
+            from components.java
+        }
+    }
+}

@@ -16,10 +16,10 @@ import java.io.InputStream;
 import java.util.Map;
 
 public class PropertyResolver {
-    private INodeEntry node;
-    private Framework framework;
-    private ExecutionContext context;
-    private IRundeckProject frameworkProject;
+    private final INodeEntry node;
+    private final Framework framework;
+    private final ExecutionContext context;
+    private final IRundeckProject frameworkProject;
 
     public PropertyResolver(INodeEntry node, Framework framework, ExecutionContext context) {
         this.node = node;
@@ -166,5 +166,16 @@ public class PropertyResolver {
     public String getProperty(String property){
         return framework.getProperty(property);
     }
+
+
+    public boolean hasProjectProperty(String property){
+        return frameworkProject.hasProperty(property);
+    }
+
+
+    public String getProjectProperty(String property){
+        return frameworkProject.getProperty(property);
+    }
+
 
 }

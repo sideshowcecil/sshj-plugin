@@ -525,4 +525,65 @@ class SSHJNodeExecutorPluginSpec extends Specification {
 
     }
 
+
+    def "authenticate using username from project settings"(){
+
+        given:
+
+        String[] command = ["ls -lrt"]
+
+        def logger = Mock(ExecutionListener) {
+            createOverride() >> Mock(ExecutionListenerOverride)
+        }
+
+        def rundeckFramework = Mock(IRundeckProject)
+        def properties = new Properties()
+        properties.setProperty("fwkprop","fwkvalue")
+        def context = getContext(properties, rundeckFramework, logger)
+
+        SSHClient client = Mock(SSHClient){
+            getTransport()>>Mock(Transport){
+                getConfig()>>SSHJDefaultConfig.init().getConfig()
+            }
+        }
+
+        def plugin = new SSHJNodeExecutorPlugin()
+        plugin.sshClient = client
+
+        def node = new NodeEntryImpl("test")
+        node.setAttributes(["osFamily":"linux",
+                            "hostname":"localhost",
+                            "ssh-connect-timeout":"3",
+                            "ssh-command-timeout":"3",
+                            "ssh-authentication":"password",
+                            "ssh-password-storage-path":"keys/password",
+                            "sudo-password-storage-path":"keys/password",
+                            "sudo-command-enabled":"true"
+        ])
+
+        when:
+        def result = plugin.executeCommand(context, command, node)
+
+        then:
+        _ * rundeckFramework.hasProperty("project.ssh.user") >> true
+        _ * rundeckFramework.getProperty("project.ssh.user") >> "root"
+        1 * client.connect(_)
+        1 * client.isConnected() >> true
+        1 * client.startSession()>>Mock(Session){
+            exec(_)>>Mock(Session.Command){
+                getExitStatus()>>0
+                getInputStream()>>Mock(InputStream){
+                    read(_)>>-1
+                }
+                getErrorStream()>>Mock(InputStream){
+                    read(_)>>-1
+                }
+            }
+        }
+        1 * logger.log(3, "Authenticating using password: keys/password")
+        result!=null
+        result.success
+
+    }
+
 }

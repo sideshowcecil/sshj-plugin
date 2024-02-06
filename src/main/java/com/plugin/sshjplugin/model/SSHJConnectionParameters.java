@@ -253,9 +253,9 @@ public class SSHJConnectionParameters implements SSHJConnection{
         String user;
         if (null != propertyResolver.nonBlank(node.getUsername()) || node.containsUserName()) {
             user = propertyResolver.nonBlank(node.extractUserName());
-        } else if (propertyResolver.hasProperty(SSHJNodeExecutorPlugin.PROJECT_SSH_USER)
-                && null != propertyResolver.nonBlank(propertyResolver.getProperty(SSHJNodeExecutorPlugin.PROJECT_SSH_USER))) {
-            user = propertyResolver.nonBlank(propertyResolver.getProperty(SSHJNodeExecutorPlugin.PROJECT_SSH_USER));
+        } else if (propertyResolver.hasProjectProperty(SSHJNodeExecutorPlugin.PROJECT_SSH_USER)
+                && null != propertyResolver.nonBlank(propertyResolver.getProjectProperty(SSHJNodeExecutorPlugin.PROJECT_SSH_USER))) {
+            user = propertyResolver.nonBlank(propertyResolver.getProjectProperty(SSHJNodeExecutorPlugin.PROJECT_SSH_USER));
         } else {
             user = propertyResolver.nonBlank(propertyResolver.getProperty(Constants.SSH_USER_PROP));
         }

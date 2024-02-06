@@ -217,6 +217,14 @@ public class SSHJConnectionParameters implements SSHJConnection{
     }
 
     @Override
+    public int getKeepAliveMaxAlive() {
+        return propertyResolver.resolveLongFwk(
+                SSHJNodeExecutorPlugin.NODE_ATTR_SSH_KEEP_MAX_ALIVE_COUNT,
+                SSHJNodeExecutorPlugin.FWK_PROP_SSH_KEEP_ALIVE_MAX_ALIVE_COUNT,
+                0).intValue();
+    }
+
+    @Override
     public int getRetryCounter() {
         return propertyResolver.resolveLongFwk(
                 SSHJNodeExecutorPlugin.NODE_ATTR_RETRY_COUNTER,

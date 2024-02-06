@@ -51,6 +51,8 @@ public interface SSHJConnection{
 
     int getKeepAliveInterval();
 
+    int getKeepAliveMaxAlive();
+
     int getRetryCounter();
 
     boolean isRetryEnabled();

@@ -43,7 +43,7 @@ public class SSHJFileCopierPlugin extends BaseFileCopier implements MultiFileCop
     static final Description DESC = DescriptionBuilder.builder()
             .name(SERVICE_PROVIDER_NAME)
             .title(SERVICE_TITLE)
-            .description("Copies a script file to a remote node via SCP.")
+            .description("Copies a script or file to a remote node via either SCP or SFTP. Supports multiple forms of authentication.")
             .property(SSHJNodeExecutorPlugin.SSH_KEY_FILE_PROP)
             .property(SSHJNodeExecutorPlugin.SSH_KEY_STORAGE_PROP)
             .property(SSHJNodeExecutorPlugin.SSH_PASSWORD_STORAGE_PROP)

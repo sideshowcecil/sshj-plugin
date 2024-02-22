@@ -52,6 +52,8 @@ public class SSHJFileCopierPlugin extends BaseFileCopier implements MultiFileCop
             .property(SSHJNodeExecutorPlugin.SSH_KEEP_ALIVE_INTERVAL)
             .property(SSHJNodeExecutorPlugin.SSH_KEEP_ALIVE_MAX_ALIVE_COUNT)
             .property(SSHJNodeExecutorPlugin.SSH_RETRY_COUNTER)
+            .property(SSHJNodeExecutorPlugin.USE_SFTP)
+
 
             .mapping(SSHJNodeExecutorPlugin.CONFIG_KEYPATH, SSHJNodeExecutorPlugin.PROJ_PROP_SSH_KEYPATH)
             .mapping(SSHJNodeExecutorPlugin.CONFIG_AUTHENTICATION, SSHJNodeExecutorPlugin.PROJ_PROP_SSH_AUTHENTICATION)
@@ -69,6 +71,8 @@ public class SSHJFileCopierPlugin extends BaseFileCopier implements MultiFileCop
             .frameworkMapping(SSHJNodeExecutorPlugin.CONFIG_KEEP_ALIVE_MAX_ALIVE_COUNT, SSHJNodeExecutorPlugin.FWK_PROP_SSH_KEEP_ALIVE_MAX_ALIVE_COUNT)
             .mapping(SSHJNodeExecutorPlugin.CONFIG_RETRY_ENABLE, SSHJNodeExecutorPlugin.PROJ_PROP_RETRY_ENABLE)
             .frameworkMapping(SSHJNodeExecutorPlugin.CONFIG_RETRY_ENABLE, SSHJNodeExecutorPlugin.FWK_PROP_RETRY_ENABLE)
+            .mapping(SSHJNodeExecutorPlugin.CONFIG_USE_SFTP, SSHJNodeExecutorPlugin.PROJ_PROP_USE_SFTP)
+            .frameworkMapping(SSHJNodeExecutorPlugin.CONFIG_USE_SFTP, SSHJNodeExecutorPlugin.FWK_PROP_USE_SFTP)
             .mapping(SSHJNodeExecutorPlugin.CONFIG_RETRY_COUNTER, SSHJNodeExecutorPlugin.PROJ_PROP_RETRY_COUNTER)
             .frameworkMapping(SSHJNodeExecutorPlugin.CONFIG_RETRY_COUNTER, SSHJNodeExecutorPlugin.FWK_PROP_RETRY_COUNTER)
             .build();

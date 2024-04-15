@@ -13,56 +13,11 @@ import net.schmizz.sshj.SSHClient
 import net.schmizz.sshj.connection.channel.direct.Session
 import net.schmizz.sshj.transport.Transport
 import org.rundeck.storage.api.Resource
-import spock.lang.Specification
 import com.dtolabs.rundeck.core.common.ProjectManager
 import com.dtolabs.rundeck.core.common.IRundeckProject
 
-class SSHJNodeExecutorPluginSpec extends Specification {
+class SSHJNodeExecutorPluginSpec extends SSHJBaseTest {
 
-    def getContext(Properties properties,def rundeckFramework,  def logger) {
-
-        def dataContext = [
-                config: ["RD_TEST": "Value"]
-        ]
-
-        def storage = Mock(StorageTree) {
-            getResource('keys/password') >> Mock(Resource) {
-                getContents() >> Mock(ResourceMeta) {
-                    writeContent(_) >> { args ->
-                        args[0].write('test.'.bytes)
-                        7L
-                    }
-                }
-            }
-
-            getResource('keys/node.key') >> Mock(Resource) {
-                getContents() >> Mock(ResourceMeta) {
-                    writeContent(_) >> { args ->
-                        args[0].write('-----BEGIN OPENSSH PRIVATE KEY-----'.bytes)
-                        7L
-                    }
-                }
-            }
-        }
-
-        def framework = Mock(Framework) {
-            getFrameworkProjectMgr() >> Mock(ProjectManager) {
-                getFrameworkProject(_) >> rundeckFramework
-            }
-            getPropertyLookup() >> PropertyLookup.create(properties)
-            getProjectManager() >> Mock(ProjectManager) {
-                getFrameworkProject(_) >> rundeckFramework
-            }
-        }
-
-        ExecutionContextImpl.builder()
-                .framework(framework)
-                .executionListener(logger)
-                .storageTree(storage)
-                .dataContext(new BaseDataContext(dataContext))
-                .frameworkProject("test")
-                .build()
-    }
 
 
     def "authenticate using node password"(){

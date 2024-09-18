@@ -66,7 +66,7 @@ public class SSHJAuthentication {
 
                     if(keys != null ){
                         if (passphrase == null) {
-                            keys.init(new StringReader(privateKeyContent), null);
+                            keys.init(new StringReader(privateKeyContent));
                         } else {
                             logger.log(3, "[sshj-debug] Using Passphrase: " + passphrasePath);
                             keys.init(new StringReader(privateKeyContent), PasswordUtils.createOneOff(passphrase.toCharArray()));

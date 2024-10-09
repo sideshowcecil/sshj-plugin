@@ -50,8 +50,8 @@ dependencies {
     pluginLibs group: 'com.hierynomus', name: 'sshj', version: '0.39.0', ext: 'jar'
     pluginLibs group: 'com.hierynomus', name: 'asn-one', version: '0.6.0', ext: 'jar'
     pluginLibs group: 'net.i2p.crypto', name: 'eddsa', version: '0.3.0', ext: 'jar'
-    implementation group: 'org.bouncycastle', name: 'bcpkix-jdk18on', version: '1.78.1', ext: 'jar'
-    implementation group: 'org.bouncycastle', name: 'bcprov-jdk18on', version: '1.78.1', ext: 'jar'
+    pluginLibs group: 'org.bouncycastle', name: 'bcpkix-jdk18on', version: '1.78.1', ext: 'jar'
+    pluginLibs group: 'org.bouncycastle', name: 'bcprov-jdk18on', version: '1.78.1', ext: 'jar'
     pluginLibs group: 'net.sf.expectit', name: 'expectit-core', version: '0.9.0'
 
     implementation group: 'commons-io', name: 'commons-io', version: '2.11.0', ext: 'jar'

@@ -12,7 +12,7 @@ groovy = "3.0.22"
 spock = "2.0-groovy-3.0"
 cglib = "3.3.0"
 objenesis = "1.4"
-axionRelease = "1.18.12"
+axionRelease = "1.18.14"
 
 [libraries]
 sshj = { group = "com.hierynomus", name = "sshj", version.ref = "sshj" }

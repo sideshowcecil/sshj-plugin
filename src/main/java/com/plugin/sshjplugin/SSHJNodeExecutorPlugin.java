@@ -188,7 +188,7 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, ProxySecretBundleCr
             false, "false");
 
     public static final Property ALWAYS_SET_PTY = PropertyUtil.bool(CONFIG_SET_PTY, "Force PTY",
-            "Always force use of new pty, enabling this option will suppress some logging",
+            "Always force use of new pty",
             false, "false");
 
     private SSHClient sshClient;

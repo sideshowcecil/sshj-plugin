@@ -53,6 +53,8 @@ public class SSHJFileCopierPlugin extends BaseFileCopier implements MultiFileCop
             .property(SSHJNodeExecutorPlugin.SSH_KEEP_ALIVE_MAX_ALIVE_COUNT)
             .property(SSHJNodeExecutorPlugin.SSH_RETRY_COUNTER)
             .property(SSHJNodeExecutorPlugin.USE_SFTP)
+            .property(SSHJNodeExecutorPlugin.STRICT_HOST_KEY_CHECKING)
+            .property(SSHJNodeExecutorPlugin.KNOWN_HOSTS_FILE)
 
 
             .mapping(SSHJNodeExecutorPlugin.CONFIG_KEYPATH, SSHJNodeExecutorPlugin.PROJ_PROP_SSH_KEYPATH)
@@ -75,6 +77,10 @@ public class SSHJFileCopierPlugin extends BaseFileCopier implements MultiFileCop
             .frameworkMapping(SSHJNodeExecutorPlugin.CONFIG_USE_SFTP, SSHJNodeExecutorPlugin.FWK_PROP_USE_SFTP)
             .mapping(SSHJNodeExecutorPlugin.CONFIG_RETRY_COUNTER, SSHJNodeExecutorPlugin.PROJ_PROP_RETRY_COUNTER)
             .frameworkMapping(SSHJNodeExecutorPlugin.CONFIG_RETRY_COUNTER, SSHJNodeExecutorPlugin.FWK_PROP_RETRY_COUNTER)
+            .mapping(SSHJNodeExecutorPlugin.CONFIG_STRICT_HOST_KEY_CHECKING, SSHJNodeExecutorPlugin.PROJ_PROP_SSH_STRICT_HOST_KEY_CHECKING)
+            .frameworkMapping(SSHJNodeExecutorPlugin.CONFIG_STRICT_HOST_KEY_CHECKING, SSHJNodeExecutorPlugin.FWK_PROP_SSH_STRICT_HOST_KEY_CHECKING)
+            .mapping(SSHJNodeExecutorPlugin.CONFIG_KNOWN_HOSTS_FILE, SSHJNodeExecutorPlugin.PROJ_PROP_SSH_KNOWN_HOSTS_FILE)
+            .frameworkMapping(SSHJNodeExecutorPlugin.CONFIG_KNOWN_HOSTS_FILE, SSHJNodeExecutorPlugin.FWK_PROP_SSH_KNOWN_HOSTS_FILE)
             .build();
 
     private SSHClient sshClient;

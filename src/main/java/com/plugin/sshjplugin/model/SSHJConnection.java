@@ -69,4 +69,14 @@ public interface SSHJConnection{
 
     boolean isAllocatePTY();
 
+    /**
+     * @return true if host keys must be verified against the known hosts file
+     */
+    boolean isStrictHostKeyChecking();
+
+    /**
+     * @return path of the known hosts file to verify against, or null to use the default ~/.ssh/known_hosts
+     */
+    String getKnownHostsFile();
+
 }

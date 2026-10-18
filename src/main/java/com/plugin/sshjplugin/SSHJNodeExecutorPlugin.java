@@ -110,6 +110,15 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, ProxySecretBundleCr
     public static final String FWK_PROP_SET_PTY = FWK_PROP_PREFIX + NODE_ATTR_ALWAYS_SET_PTY;
     public static final String PROJ_PROP_SET_PTY = PROJ_PROP_PREFIX + NODE_ATTR_ALWAYS_SET_PTY;
 
+    public static final String CONFIG_STRICT_HOST_KEY_CHECKING = "strictHostKeyChecking";
+    public static final String CONFIG_KNOWN_HOSTS_FILE = "knownHostsFile";
+    public static final String NODE_ATTR_SSH_STRICT_HOST_KEY_CHECKING = "ssh-strict-host-key-checking";
+    public static final String NODE_ATTR_SSH_KNOWN_HOSTS_FILE = "ssh-known-hosts-file";
+    public static final String FWK_PROP_SSH_STRICT_HOST_KEY_CHECKING = FWK_PROP_PREFIX + NODE_ATTR_SSH_STRICT_HOST_KEY_CHECKING;
+    public static final String PROJ_PROP_SSH_STRICT_HOST_KEY_CHECKING = PROJ_PROP_PREFIX + NODE_ATTR_SSH_STRICT_HOST_KEY_CHECKING;
+    public static final String FWK_PROP_SSH_KNOWN_HOSTS_FILE = FWK_PROP_PREFIX + NODE_ATTR_SSH_KNOWN_HOSTS_FILE;
+    public static final String PROJ_PROP_SSH_KNOWN_HOSTS_FILE = PROJ_PROP_PREFIX + NODE_ATTR_SSH_KNOWN_HOSTS_FILE;
+
     public static final String SUDO_OPT_PREFIX = "sudo-";
 
     public static final String DEFAULT_SUDO_PROMPT_PATTERN = "[sudo] password for";
@@ -191,6 +200,17 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, ProxySecretBundleCr
             "Always force use of new pty",
             false, "false");
 
+    static final Property STRICT_HOST_KEY_CHECKING = PropertyUtil.bool(CONFIG_STRICT_HOST_KEY_CHECKING,
+            "Strict Host Key Checking",
+            "Only connect to nodes whose host key is listed in the known hosts file, and fail on unknown or changed host keys. " +
+            "When disabled (the default) any host key is accepted. Can be overridden by a Node attribute named 'ssh-strict-host-key-checking'.",
+            false, "false");
+
+    static final Property KNOWN_HOSTS_FILE = PropertyUtil.string(CONFIG_KNOWN_HOSTS_FILE, "Known Hosts File",
+            "Path to an OpenSSH known_hosts file on the Rundeck server, used when Strict Host Key Checking is enabled. " +
+            "Defaults to ~/.ssh/known_hosts (and known_hosts2) of the user running Rundeck. Can be overridden by a Node attribute named 'ssh-known-hosts-file'.",
+            false, null);
+
     private SSHClient sshClient;
 
     public void setSshClient(SSHClient sshClient) {
@@ -220,6 +240,8 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, ProxySecretBundleCr
         builder.property(SSH_RETRY_ENABLE);
         builder.property(SSH_RETRY_COUNTER);
         builder.property(ALWAYS_SET_PTY);
+        builder.property(STRICT_HOST_KEY_CHECKING);
+        builder.property(KNOWN_HOSTS_FILE);
 
         //mapping config input on project and framework level
         builder.mapping(CONFIG_KEYPATH, PROJ_PROP_SSH_KEYPATH);
@@ -245,6 +267,11 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, ProxySecretBundleCr
 
         builder.mapping(CONFIG_SET_PTY, PROJ_PROP_SET_PTY);
         builder.frameworkMapping(CONFIG_SET_PTY, FWK_PROP_SET_PTY);
+
+        builder.mapping(CONFIG_STRICT_HOST_KEY_CHECKING, PROJ_PROP_SSH_STRICT_HOST_KEY_CHECKING);
+        builder.frameworkMapping(CONFIG_STRICT_HOST_KEY_CHECKING, FWK_PROP_SSH_STRICT_HOST_KEY_CHECKING);
+        builder.mapping(CONFIG_KNOWN_HOSTS_FILE, PROJ_PROP_SSH_KNOWN_HOSTS_FILE);
+        builder.frameworkMapping(CONFIG_KNOWN_HOSTS_FILE, FWK_PROP_SSH_KNOWN_HOSTS_FILE);
 
         return builder.build();
     }

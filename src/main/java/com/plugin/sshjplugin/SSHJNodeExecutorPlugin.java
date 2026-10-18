@@ -218,6 +218,23 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, ProxySecretBundleCr
     }
 
     /**
+     * Create the SSH client for a single command execution. A new client is used every time, so host key
+     * verifiers and other connection state never carry over between nodes or executions.
+     *
+     * @param listener execution logger used for SSHJ logging
+     * @return the client set with {@link #setSshClient(SSHClient)} (for tests), otherwise a new client
+     */
+    SSHClient createSshClient(final ExecutionListener listener) {
+        if (sshClient != null) {
+            return sshClient;
+        }
+        final DefaultConfig config = SSHJDefaultConfig.init().getConfig();
+        config.setLoggerFactory(new SSHJPluginLoggerFactory(listener));
+        config.setKeepAliveProvider(KeepAliveProvider.KEEP_ALIVE);
+        return new SSHClient(config);
+    }
+
+    /**
      * Overriding this method gives the plugin a chance to take part in building the {@link
      * com.dtolabs.rundeck.core.plugins.configuration.Description} presented by this plugin.  This subclass can use the
      * {@link DescriptionBuilder} to modify all aspects of the description, add or remove properties, etc.
@@ -313,18 +330,14 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, ProxySecretBundleCr
         String errormsg = null;
 
 
+        SSHClient client = null;
         try {
-            if(sshClient ==null){
-                final DefaultConfig config = SSHJDefaultConfig.init().getConfig();
-                config.setLoggerFactory(new SSHJPluginLoggerFactory(listener));
-                config.setKeepAliveProvider(KeepAliveProvider.KEEP_ALIVE);
-                sshClient = new SSHClient(config);
-            }
+            client = createSshClient(listener);
             if (sshexec == null) {
                 throw new SSHJBuilder.BuilderException("Failed to initialize SSH executor");
             }
-            sshexec.connect(sshClient);
-            sshexec.execute(sshClient);
+            sshexec.connect(client);
+            sshexec.execute(client);
             success = true;
         } catch (Exception e) {
             final ExtractFailure extractFailure = extractFailure(e, node, commandtimeout, contimeout, context.getFramework());
@@ -339,10 +352,10 @@ public class SSHJNodeExecutorPlugin implements NodeExecutor, ProxySecretBundleCr
                     )
             );
         }finally {
-            if(sshClient != null){
+            if(client != null){
                 try {
-                    sshClient.disconnect();
-                    sshClient.close();
+                    client.disconnect();
+                    client.close();
                 } catch (Exception iex) {
                     // Log cleanup errors instead of throwing to avoid masking original exception
                     listener.log(2, "[" + getClass().getSimpleName() + "] Error closing SSH client: " + 

@@ -53,6 +53,8 @@ public class SSHJFileCopierPlugin extends BaseFileCopier implements MultiFileCop
             .property(SSHJNodeExecutorPlugin.SSH_KEEP_ALIVE_MAX_ALIVE_COUNT)
             .property(SSHJNodeExecutorPlugin.SSH_RETRY_COUNTER)
             .property(SSHJNodeExecutorPlugin.USE_SFTP)
+            .property(SSHJNodeExecutorPlugin.STRICT_HOST_KEY_CHECKING)
+            .property(SSHJNodeExecutorPlugin.KNOWN_HOSTS_FILE)
 
 
             .mapping(SSHJNodeExecutorPlugin.CONFIG_KEYPATH, SSHJNodeExecutorPlugin.PROJ_PROP_SSH_KEYPATH)
@@ -75,12 +77,31 @@ public class SSHJFileCopierPlugin extends BaseFileCopier implements MultiFileCop
             .frameworkMapping(SSHJNodeExecutorPlugin.CONFIG_USE_SFTP, SSHJNodeExecutorPlugin.FWK_PROP_USE_SFTP)
             .mapping(SSHJNodeExecutorPlugin.CONFIG_RETRY_COUNTER, SSHJNodeExecutorPlugin.PROJ_PROP_RETRY_COUNTER)
             .frameworkMapping(SSHJNodeExecutorPlugin.CONFIG_RETRY_COUNTER, SSHJNodeExecutorPlugin.FWK_PROP_RETRY_COUNTER)
+            .mapping(SSHJNodeExecutorPlugin.CONFIG_STRICT_HOST_KEY_CHECKING, SSHJNodeExecutorPlugin.PROJ_PROP_SSH_STRICT_HOST_KEY_CHECKING)
+            .frameworkMapping(SSHJNodeExecutorPlugin.CONFIG_STRICT_HOST_KEY_CHECKING, SSHJNodeExecutorPlugin.FWK_PROP_SSH_STRICT_HOST_KEY_CHECKING)
+            .mapping(SSHJNodeExecutorPlugin.CONFIG_KNOWN_HOSTS_FILE, SSHJNodeExecutorPlugin.PROJ_PROP_SSH_KNOWN_HOSTS_FILE)
+            .frameworkMapping(SSHJNodeExecutorPlugin.CONFIG_KNOWN_HOSTS_FILE, SSHJNodeExecutorPlugin.FWK_PROP_SSH_KNOWN_HOSTS_FILE)
             .build();
 
     private SSHClient sshClient;
 
     public void setSshClient(SSHClient sshClient) {
         this.sshClient = sshClient;
+    }
+
+    /**
+     * Create the SSH client for a single copy operation. A new client is used every time, so host key
+     * verifiers and other connection state never carry over between nodes or executions.
+     *
+     * @return the client set with {@link #setSshClient(SSHClient)} (for tests), otherwise a new client
+     */
+    SSHClient createSshClient() {
+        if (sshClient != null) {
+            return sshClient;
+        }
+        final DefaultConfig config = SSHJDefaultConfig.init().getConfig();
+        config.setKeepAliveProvider(KeepAliveProvider.KEEP_ALIVE);
+        return new SSHClient(config);
     }
 
     @Override
@@ -162,15 +183,11 @@ public class SSHJFileCopierPlugin extends BaseFileCopier implements MultiFileCop
                     StepFailureReason.ConfigurationFailure, e);
         }
 
-        if(sshClient ==null){
-            final DefaultConfig config = SSHJDefaultConfig.init().getConfig();
-            config.setKeepAliveProvider(KeepAliveProvider.KEEP_ALIVE);
-            sshClient = new SSHClient(config);
-        }
-        scp.connect(sshClient);
+        final SSHClient client = createSshClient();
+        scp.connect(client);
 
         try {
-            scp.execute(sshClient);
+            scp.execute(client);
         } catch (Exception e) {
             throw new FileCopierException("Configuration error: " + e.getMessage(),
                     StepFailureReason.ConfigurationFailure, e);
@@ -186,8 +203,8 @@ public class SSHJFileCopierPlugin extends BaseFileCopier implements MultiFileCop
         }
 
         try {
-            sshClient.disconnect();
-            sshClient.close();
+            client.disconnect();
+            client.close();
         } catch (IOException iex) {
             throw new SSHJBuilder.BuilderException(iex);
         }
@@ -220,23 +237,19 @@ public class SSHJFileCopierPlugin extends BaseFileCopier implements MultiFileCop
                     StepFailureReason.ConfigurationFailure, e);
         }
 
-        if(sshClient ==null){
-            final DefaultConfig config = SSHJDefaultConfig.init().getConfig();
-            config.setKeepAliveProvider(KeepAliveProvider.KEEP_ALIVE);
-            sshClient = new SSHClient(config);
-        }
-        scp.connect(sshClient);
+        final SSHClient client = createSshClient();
+        scp.connect(client);
 
         try {
-            scp.execute(sshClient);
+            scp.execute(client);
         } catch (Exception e) {
             throw new FileCopierException("Configuration error: " + e.getMessage(),
                     StepFailureReason.ConfigurationFailure, e);
         }
 
         try {
-            sshClient.disconnect();
-            sshClient.close();
+            client.disconnect();
+            client.close();
         } catch (IOException iex) {
             throw new SSHJBuilder.BuilderException(iex);
         }

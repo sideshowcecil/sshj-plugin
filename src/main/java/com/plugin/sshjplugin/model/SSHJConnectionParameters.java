@@ -212,6 +212,20 @@ public class SSHJConnectionParameters implements SSHJConnection{
     }
 
     @Override
+    public boolean isStrictHostKeyChecking() {
+        return propertyResolver.resolveBoolean(SSHJNodeExecutorPlugin.NODE_ATTR_SSH_STRICT_HOST_KEY_CHECKING);
+    }
+
+    @Override
+    public String getKnownHostsFile() {
+        String path = propertyResolver.resolve(SSHJNodeExecutorPlugin.NODE_ATTR_SSH_KNOWN_HOSTS_FILE);
+        if (path == null || path.trim().isEmpty()) {
+            return null;
+        }
+        return path.trim();
+    }
+
+    @Override
     public int getKeepAliveInterval() {
 
         return propertyResolver.resolveLongFwk(

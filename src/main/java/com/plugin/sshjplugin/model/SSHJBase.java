@@ -8,6 +8,7 @@ import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.transport.TransportException;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
@@ -79,19 +80,11 @@ public class SSHJBase {
         pluginLogger.log(3, "["+getPluginName()+"] useSftp: " + useSftp);
 
         ssh.getTransport().getConfig().setLoggerFactory(new SSHJPluginLoggerFactory(pluginLogger));
-        ssh.addHostKeyVerifier(new PromiscuousVerifier());
         ssh.setConnectTimeout(connectTimeout);
         ssh.setTimeout(commandTimeout);
         ssh.getTransport().setTimeoutMs(connectTimeout);
 
-        pluginLogger.log(3, "["+getPluginName()+"] adding loadKnownHosts" );
-
-        try {
-            ssh.loadKnownHosts();
-        } catch (IOException e) {
-            pluginLogger.log(3, "["+getPluginName()+"] Warning: Could not load known hosts: " + e.getMessage() + 
-                          " (" + e.getClass().getSimpleName() + ")");
-        }
+        configureHostKeyVerification(ssh);
 
         int count=0;
         if(!retry){
@@ -159,5 +152,54 @@ public class SSHJBase {
         }
     }
 
+    /**
+     * Configure how the server host key is verified.
+     * <p>
+     * With strict host key checking enabled, only host keys listed in the known hosts file are accepted,
+     * so connections to unknown hosts or hosts whose key changed fail. Otherwise any host key is accepted.
+     *
+     * @param ssh client to configure
+     * @throws SSHJBuilder.BuilderException if strict checking is enabled and the configured known hosts file
+     *                                      cannot be read
+     */
+    void configureHostKeyVerification(SSHClient ssh) {
+        if (sshjConnection.isStrictHostKeyChecking()) {
+            String knownHostsFile = sshjConnection.getKnownHostsFile();
+            try {
+                if (knownHostsFile != null) {
+                    File file = new File(knownHostsFile);
+                    if (!file.isFile() || !file.canRead()) {
+                        throw new SSHJBuilder.BuilderException(
+                                "Strict host key checking is enabled but the known hosts file cannot be read: "
+                                + knownHostsFile
+                        );
+                    }
+                    pluginLogger.log(3, "["+getPluginName()+"] strict host key checking, known hosts file: " + knownHostsFile);
+                    ssh.loadKnownHosts(file);
+                } else {
+                    pluginLogger.log(3, "["+getPluginName()+"] strict host key checking, using default known hosts file");
+                    ssh.loadKnownHosts();
+                }
+            } catch (IOException e) {
+                throw new SSHJBuilder.BuilderException(
+                        "Strict host key checking is enabled but the known hosts file could not be loaded: "
+                        + e.getMessage(),
+                        e
+                );
+            }
+            return;
+        }
+
+        ssh.addHostKeyVerifier(new PromiscuousVerifier());
+
+        pluginLogger.log(3, "["+getPluginName()+"] adding loadKnownHosts" );
+
+        try {
+            ssh.loadKnownHosts();
+        } catch (IOException e) {
+            pluginLogger.log(3, "["+getPluginName()+"] Warning: Could not load known hosts: " + e.getMessage() +
+                          " (" + e.getClass().getSimpleName() + ")");
+        }
+    }
 
 }

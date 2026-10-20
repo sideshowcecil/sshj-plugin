@@ -52,6 +52,23 @@ Demo-Ubuntu:
   
 ```
 
+### Host key verification
+
+By default the plugin accepts any host key presented by the node. To only connect to nodes whose host key you trust, enable strict host key checking:
+
+| Node attribute | Project property | Framework property | Description |
+|---|---|---|---|
+| `ssh-strict-host-key-checking` | `project.ssh-strict-host-key-checking` | `framework.ssh-strict-host-key-checking` | `true` to require the node's host key to be in the known hosts file. Unknown hosts and changed host keys fail the connection. Default `false`. |
+| `ssh-known-hosts-file` | `project.ssh-known-hosts-file` | `framework.ssh-known-hosts-file` | Path to an OpenSSH `known_hosts` file on the Rundeck server. Default: `~/.ssh/known_hosts` and `~/.ssh/known_hosts2` of the user running Rundeck. |
+
+Both can also be set in the plugin settings at project or framework level. The known hosts file uses the standard OpenSSH format, so it can be built with `ssh-keyscan` as the user running Rundeck (check the fingerprints against a trusted source):
+
+```
+ssh-keyscan -H node1.example.com >> ~/.ssh/known_hosts
+```
+
+Nodes on a non-default port are matched as `[host]:port`, the same as OpenSSH.
+
 # Status
 
 - [X] Key Storage Password Authentication

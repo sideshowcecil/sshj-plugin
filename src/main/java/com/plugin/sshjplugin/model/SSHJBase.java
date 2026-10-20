@@ -123,10 +123,13 @@ public class SSHJBase {
                     connectionNumber++;
                 }
 
+                // connected and authenticated: stop, reconnecting the same client fails
+                break;
+
             } catch (TransportException e) {
                 pluginLogger.log(2, "["+getPluginName()+"] TransportException: " + e.getMessage() + 
                               " (" + e.getClass().getSimpleName() + ")");
-                if(retry && count<=retryCount){
+                if(retry && count<retryCount){
                     retryConnections++;
                     pluginLogger.log(2, "["+getPluginName()+"]  trying again");
                     pluginLogger.log(2, "["+getPluginName()+"]  total connections " + connectionNumber);

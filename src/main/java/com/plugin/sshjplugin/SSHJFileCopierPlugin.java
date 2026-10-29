@@ -240,7 +240,7 @@ public class SSHJFileCopierPlugin extends BaseFileCopier implements MultiFileCop
 
         SSHClient client = null;
         try {
-            createSshClient();
+            client = createSshClient();
             scp.connect(client);
             scp.execute(client);
         } catch (Exception e) {

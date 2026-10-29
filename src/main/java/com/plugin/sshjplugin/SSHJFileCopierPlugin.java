@@ -205,7 +205,9 @@ public class SSHJFileCopierPlugin extends BaseFileCopier implements MultiFileCop
                     client.disconnect();
                     client.close();
                 } catch (IOException iex) {
-                    throw new SSHJBuilder.BuilderException(iex);
+                    // Log cleanup errors instead of throwing to avoid masking original exception
+                    logger.log(Constants.WARN_LEVEL, "[sshj-scp] Error closing SSH connection: " +
+                        iex.getMessage());
                 }
             }
         }
@@ -252,7 +254,9 @@ public class SSHJFileCopierPlugin extends BaseFileCopier implements MultiFileCop
                     client.disconnect();
                     client.close();
                 } catch (IOException iex) {
-                    throw new SSHJBuilder.BuilderException(iex);
+                    // Log cleanup errors instead of throwing to avoid masking original exception
+                    logger.log(Constants.WARN_LEVEL, "[sshj-scp] Error closing SSH connection: " +
+                        iex.getMessage());
                 }
             }
         }

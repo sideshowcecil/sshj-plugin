@@ -183,10 +183,10 @@ public class SSHJFileCopierPlugin extends BaseFileCopier implements MultiFileCop
                     StepFailureReason.ConfigurationFailure, e);
         }
 
-        final SSHClient client = createSshClient();
-        scp.connect(client);
-
+        SSHClient client = null;
         try {
+            client = createSshClient();
+            scp.connect(client);
             scp.execute(client);
         } catch (Exception e) {
             throw new FileCopierException("Configuration error: " + e.getMessage(),
@@ -200,13 +200,14 @@ public class SSHJFileCopierPlugin extends BaseFileCopier implements MultiFileCop
                     );
                 }
             }
-        }
-
-        try {
-            client.disconnect();
-            client.close();
-        } catch (IOException iex) {
-            throw new SSHJBuilder.BuilderException(iex);
+            if (null != client) {
+                try {
+                    client.disconnect();
+                    client.close();
+                } catch (IOException iex) {
+                    throw new SSHJBuilder.BuilderException(iex);
+                }
+            }
         }
 
         return remotefile;
@@ -237,21 +238,23 @@ public class SSHJFileCopierPlugin extends BaseFileCopier implements MultiFileCop
                     StepFailureReason.ConfigurationFailure, e);
         }
 
-        final SSHClient client = createSshClient();
-        scp.connect(client);
-
+        SSHClient client = null;
         try {
+            createSshClient();
+            scp.connect(client);
             scp.execute(client);
         } catch (Exception e) {
             throw new FileCopierException("Configuration error: " + e.getMessage(),
                     StepFailureReason.ConfigurationFailure, e);
-        }
-
-        try {
-            client.disconnect();
-            client.close();
-        } catch (IOException iex) {
-            throw new SSHJBuilder.BuilderException(iex);
+        } finally {
+            if (null != client) {
+                try {
+                    client.disconnect();
+                    client.close();
+                } catch (IOException iex) {
+                    throw new SSHJBuilder.BuilderException(iex);
+                }
+            }
         }
 
         ArrayList<String> ret = new ArrayList<>();
